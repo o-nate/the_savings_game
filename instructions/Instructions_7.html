@@ -1,0 +1,99 @@
+{{ block title }}
+
+{{ extends 'global/Progress_Bar.html' }}
+
+{{ endblock }}
+
+{{ block content }}
+
+{{ if fr }}
+<h1>Survie</h1>
+Pour survivre d'un mois virtuel à l'autre, vous devez
+<b>consommer une unité d’{{ Lexicon.food }} chaque mois</b>.
+Le montant minimum que vous devez avoir dans votre
+{{ Lexicon.stock }} pour survivre jusqu'au mois suivant est de
+1. Si, au cours du jeu, vous terminez un mois où la valeur de
+votre {{ Lexicon.stock }} est de 0, vous ne survivez pas, et
+le jeu se termine.<br><br>
+
+Chaque mois, vous avez la possibilité d'acheter des
+{{ Lexicon.food }} au prix indiqué dans le
+{{ Lexicon.catalog }}.<br><br>
+
+Comme vous ne consommez qu'une seule {{ Lexicon.unit }}
+d’{{ Lexicon.food }} par mois et que <b>les {{ Lexicon.food }} ne
+  sont pas périssables</b>, toutes les {{ Lexicon.units }}
+supplémentaires que vous achèterez au cours du mois seront
+conservées en {{ Lexicon.stock }}. Si vous avez des
+{{ Lexicon.food }} en {{ Lexicon.stock }}, vous n'êtes pas
+obligé d'en acheter d'autres.<br><br>
+
+Si vous avez 3 {{ Lexicon.units }} d’{{ Lexicon.food }},
+vous pouvez survivre sans rien acheter pendant les 3 mois suivants.
+Si le niveau de votre {{ Lexicon.stock }} plus le nombre du
+mois actuel est égal à {{ total_stock_needed }}, vous survivrez
+jusqu'à la fin du jeu.
+<br><br>
+
+<h3>Rémunération</h3>
+Note : Si le jeu se termine parce que vous ne parvenez pas
+à terminer le mois avec un {{ Lexicon.stock }} <b>
+  au moins égal à 1</b>, le montant final de votre {{ Lexicon.savings_account }}
+sera ramené à 0,00₮ et le jeu se termine.<br><br>
+
+<b>Cependant, vous pouvez toujours obtenir une rémunération
+  supplémentaire pour cette journée en remplissant les tâches ou questionnaires
+  supplémentaires et en faisant le second tour du jeu.
+</b><br><br>
+
+<h3>Question de compréhension</h3>
+
+{{ else }}
+<h1>Survival</h1>
+To survive from one month to the next, you must <b>
+  eat one {{ Lexicon.unit }} of {{ Lexicon.food }} each
+  month
+</b>. The minimum amount you must have in your
+{{ Lexicon.stock }} to survive to the next month is 1. If
+during the game you end a month when your
+{{ Lexicon.stock }} value is 0, you die, and the game ends.
+<br><br>
+
+Every month, you have the option to buy {{ Lexicon.food }}
+at the price listed in the {{ Lexicon.catalog }}.<br><br>
+
+Since you only eat 1 {{ Lexicon.unit }} of
+{{ Lexicon.food }} per month and the {{ Lexicon.food }}
+is nonperishable, any additional {{ Lexicon.units }} you
+purchase in a month are saved in {{ Lexicon.stock }}. If you
+have {{ Lexicon.food }} in {{ Lexicon.stock }}, you are
+not obligated to buy any more.<br><br>
+
+If you have 3 {{ Lexicon.units }} of {{ Lexicon.food }},
+you can survive without buying anything for 3 months. If your
+current stock level plus the current month number add to
+{{ total_stock_needed }}, you will survive until the end of the
+game.<br><br>
+
+<h3>Remuneration</h3>
+Note: If the game ends because you are unable to end the month
+with your {{ Lexicon.stock }} equal to <b>1 or more</b>,
+the final amount of your {{ Lexicon.savings_account }}
+recorded for that day will be 0₮.<br><br>
+<b>But, you can still earn additional remuneration for that day
+  by answering follow-up questions and completing the day's
+  supplementary tasks or questionnaires.<br><br>
+
+  You also still have three other rounds to increase your
+  remuneration.
+</b><br><br>
+
+<h3>Comprehension Question</h3>
+
+{{ endif }}
+
+{{ formfields }}
+
+{{ next_button }}
+
+{{ endblock }}

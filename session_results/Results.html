@@ -1,0 +1,31 @@
+{{ block title }}
+
+{{ if fr }}
+Session terminée
+
+{{ else }}
+Session Complete
+
+{{ endif }}
+
+{{ endblock }}
+
+{{ block content }}
+
+{{ if fr }}
+<p>
+    Vous avez terminé la session d'aujourd'hui.<br><br>
+    Veuillez cliquer sur le bouton Suivant ci-dessous pour terminer cette session.<br><br>
+</p>
+
+{{ else }}
+<p>
+    You have completed today's session.<br><br>
+    Please, click the Next button below to end this session.<br><br>
+</p>
+
+{{ endif }}
+
+{{ next_button }}
+
+{{ endblock }}

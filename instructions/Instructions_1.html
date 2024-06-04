@@ -1,0 +1,61 @@
+{{ block content }}
+{{ if fr }}
+<h1>Instructions: {{ Lexicon.game }}</h1>
+Nous allons maintenant expliquer le {{ Lexicon.game }} dans les pages
+suivantes. Comme nous l'avons déjà mentionné, vous allez jouer deux tours du
+jeu pendant l'expérience d'aujourd'hui.
+<br /><br />
+
+Dans les pages suivantes, nous vous expliquerons comment fonctionne le Jeu de
+l’Épargne.<br /><br />
+
+<h3>Questions de compréhension et de pratique</h3>
+Pour vérifier votre compréhension des instructions, nous vous poserons des
+questions ou nous vous demanderons d'effectuer certaines tâches liées au
+{{Lexicon.game}} au cours des pages suivantes.<br /><br />
+
+Si vous êtes prêt à poursuivre, veuillez cliquer sur le bouton "Suivant"
+ci-dessous.<br /><br />
+
+{{ else }}
+<h1>Instructions: {{ Lexicon.game }}</h1>
+We will now explain the {{ Lexicon.game }} on the following pages. As
+mentioned before, you will complete play the game four times over the course of
+four days.<br /><br />
+
+On the following pages, we will explain how the {{ Lexicon.game }}
+works.<br /><br />
+
+<h3>Comprehension and Practice Questions</h3>
+As you go through the instructions on the following pages, we will ask you
+questions or have you perform certain tasks related to the {{Lexicon.game}}
+to confirm you understand the game's mechanics and rules.<br /><br />
+
+When you are ready to proceed, please click the Next below.
+<br /><br />
+
+{{ endif }}
+
+{{ next_button }}
+
+
+<input type="hidden" name="startTime" id="startTime" />
+
+
+
+<script>
+    // TIMER
+    // This creates the variable that marks the start time
+    let pageTimerID = -1;
+
+    // This function automatically starts the timer when the page loads.
+    window.onload = function () {
+        if (pageTimerID == -1) {
+            pageTimerID = (new Date()).getTime();
+            console.log(pageTimerID);
+            document.getElementById("startTime").value = pageTimerID;
+            console.log(document.getElementById("startTime").value);
+        }
+    }
+</script>
+{{ endblock }}

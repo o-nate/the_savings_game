@@ -1,0 +1,23 @@
+{{ block title }}
+
+{{ if fr}}
+Bienvenue
+{{ else }}
+Welcome
+{{ endif }}
+
+{{ endblock }}
+
+{{ block content }}
+
+{{ if fr }}
+<p>Vous allez maintenant commencer le jeu. {{ Lexicon.click_next }}</p>
+
+{{ else }}
+<p>You will now begin the {{ Lexicon.game }}. {{ Lexicon.click_next }}</p>
+
+{{ endif }}
+
+{{ next_button }}
+
+{{ endblock }}

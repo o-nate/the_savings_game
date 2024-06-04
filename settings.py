@@ -11,49 +11,40 @@ CONVERSION_FACTOR = 750
 
 SESSION_CONFIGS = [
     dict(
-        name="init",
-        display_name="init",
-        app_sequence=["init"],
-        num_demo_participants=1,
-        day="0",
-    ),
-    dict(
-        name="task_1",
-        display_name="Task 1",
+        name="complete",
+        display_name="The Savings Game",
         app_sequence=[
-            "task_instructions",
-            "task",
-            "task_int",
-            "redirectapp",
+            "filler",
+            "instructions",
+            "savings_game",
+            "session_results",
         ],
         num_demo_participants=1,
     ),
     dict(
-        name="task_2",
-        display_name="Task 2",
-        app_sequence=["task", "redirectapp"],
-        num_demo_participants=1,
-    ),
-    dict(
-        name="sessionResults",
-        display_name="sessionResults",
-        app_sequence=["sessionResults", "redirecttopayment"],
+        name="savings_game",
+        display_name="The Savings Game (Standalone)",
+        app_sequence=[
+            "filler",
+            "savings_game",
+        ],
         num_demo_participants=1,
     ),
     dict(
         name="instructions",
         display_name="Instructions",
         app_sequence=[
-            "filler",
-            "task_instructions",
-            "redirectapp",
+            "instructions",
         ],
         num_demo_participants=1,
     ),
     dict(
-        name="intervention_feedback",
-        display_name="Intervention avec feedback",
-        app_sequence=["filler", "task", "task_int", "redirectapp"],
+        name="session_results",
+        display_name="Session Results",
+        app_sequence=[
+            "filler",
+            "session_results",
+        ],
         num_demo_participants=1,
     ),
 ]
@@ -64,6 +55,7 @@ SESSION_CONFIGS = [
 # e.g. self.session.config['participation_fee']
 
 SESSION_CONFIG_DEFAULTS = dict(
+    exp_length_rounds=1,
     inflation=[
         # * Define potential inflation sequences
         [430, 430],

@@ -1,0 +1,44 @@
+{{ block title }}
+
+{{ extends 'global/Progress_Bar.html' }}
+
+{{ endblock }}
+
+{{ block content }}
+
+{{ if fr }}
+<h3>Valeurs constantes et variables</h3>
+Il faut noter que le {{ Lexicon.interest_rate }} et votre
+{{ Lexicon.salary }} ne changent pas pendant le jeu.<br><br>
+
+{{ if control }}
+Le prix d'une {{ Lexicon.unit }} d'{{ Lexicon.food }} peut changer.
+Cependant, il ne peut qu'augmenter.<br><br>
+
+{{ else }}
+
+{{ endif }}
+
+<h3>Question de compréhension</h3>
+
+{{ else }}
+It should be noted that the {{ Lexicon.interest_rate }} and your {{
+Lexicon.salary }} do not change during the
+game.<br><br>
+
+{{ if control }}
+The price of {{ Lexicon.food }} can change. But, it can only
+increase.<br><br>
+
+{{ else }}
+
+{{ endif }}
+
+<h3>Comprehension Question</h3>
+
+{{ endif }}
+{{ formfields }}
+
+{{ next_button }}
+
+{{ endblock }}

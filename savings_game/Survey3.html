@@ -1,0 +1,21 @@
+{{ block title }}
+{{ if fr }}
+Changement de prix | Mois {{ player.round_number }} de {{ C.NUM_ROUNDS }}
+{{ else }}
+Price-change | Month {{ player.round_number }} of {{ C.NUM_ROUNDS }}
+{{ endif }}
+{{ endblock }}
+
+{{ block content }}
+<br>
+{{ if player.round_number == 1 }}
+{{ Lexicon.qualitative_expectation_month_1 }}
+{{ else }}
+{{ Lexicon.qualitative_expectation }}
+{{ endif }}
+
+{{ formfield "qualitative_expectation" }}
+
+{{ next_button }}
+
+{{ endblock }}

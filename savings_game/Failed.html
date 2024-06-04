@@ -1,0 +1,16 @@
+{{ block content }}
+
+{{ if fr }}
+Désolé, vous n'avez pas survécu. Le solde final de votre compte épargne a été
+enregistré de 0₮.<br><br>
+Cliquez sur le bouton "Suivant" ci-dessous lorsque vous serez prêt à poursuivre
+aux questions de suivi.<br><br>
+{{ else }}
+Sorry, you did not survive. Your final {{ Lexicon.savings_account }} balance has
+been recorded as 0₮.<br><br>
+Click the Next button below to proceed the follow-up questions.<br><br>
+{{ endif }}
+
+{{ next_button }}
+
+{{ endblock }}

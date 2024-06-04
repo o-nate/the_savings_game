@@ -1,0 +1,16 @@
+{{ block title }}
+{{ if fr }}
+Changement de prix | Mois {{ player.round_number }} de {{ C.NUM_ROUNDS }}
+{{ else }}
+Price-change | Month {{ player.round_number }} of {{ C.NUM_ROUNDS }}
+{{ endif }}
+{{ endblock }}
+
+
+{{ block content }}
+<br>
+{{ formfield "inf_expectation" }}
+
+{{ next_button }}
+
+{{ endblock }}

@@ -1,0 +1,89 @@
+<div class="flex-container">
+    <div class="flex-child">
+        <h4>{{ Lexicon.starting_balances }}</h4>
+        <div class="card border-0" style="padding: 1em 0 0 0">
+            <div class="card-body" style="line-height: 19px">
+                <h6 class="card-title"><b>{{
+                        Lexicon.interest_earned_last_period }}</b></h6>
+                <p class="card-text">
+                    <span id="interest-earned"></span>
+                </p>
+            </div>
+        </div>
+
+        <div class="card border-0">
+            <div class="card-body" style="line-height: 19px">
+                <h6 class="card-title"><b>{{ Lexicon.total_cash }}</b></h6>
+                <p class="card-text">
+                    <span id="total-cash"></span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-child">
+        <h4>{{ Lexicon.ending_balances }}</h4>
+        <div class="card border-0" style="padding: 1em 0 0 0">
+            <div class="card-body">
+                <h6 class="card-title"><b>{{ Lexicon.savings_account }}</b>
+                </h6>
+                <p class="card-text">
+                    <span id="final-savings"></span>
+                </p>
+            </div>
+        </div>
+
+        <div class="card border-0">
+            <div class="card-body">
+                <h6 class="card-title"><b>{{ Lexicon.stock }}</b></h6>
+                <p class="card-text">
+                    {{ if int }}
+                    {{ stock }}
+                    {{ else }}
+                    <span id="final-stock"></span> <span id="units"></span>
+                    {{ endif }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-child-2">
+        <h4>{{ Lexicon.market_data }}</h4>
+
+        {{ if nominal }}
+
+        <div class="card border-0" style="padding: 1em 0 0 0">
+            <div class="card-body">
+                <h6 class="card-title"><b>{{ Lexicon.interest_rate }}</b>
+                </h6>
+                <p class="card-text">
+                    {{ nominal_interest_rate }} %
+                </p>
+            </div>
+        </div>
+
+        {{ elif real }}
+
+        <div class="card border-0" style="padding: 1em 0 0 0">
+            <div class="card-body">
+                <h6 class="card-title"><b>{{ Lexicon.real_interest_rate
+                        }}</b></h6>
+                <p class="card-text">
+                    <span id="real-interest"></span> %
+                </p>
+            </div>
+        </div>
+
+        {{ endif }}
+
+        <div class="card border-0">
+            <div class="card-body">
+                <h6 class="card-title"><b>{{ Lexicon.salary }}</b></h6>
+                <p class="card-text">
+                    {{ income }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>

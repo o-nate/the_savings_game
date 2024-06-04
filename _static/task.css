@@ -1,0 +1,37 @@
+.flex-container {
+    float: center;
+    padding: 20px;
+}
+
+.flex-child {
+    width: 33%;
+    float: left;
+    padding: 20px;
+}
+
+.flex-child-2 {
+    width: 33%;
+    min-height: 247.98px;
+    float: left;
+    padding: 20px;
+}
+
+.flex-child-3 {
+    width: 33%;
+    float: left;
+    padding: 20px;
+}
+
+.flex-child-4 {
+    width: 67%;
+    float: right;
+    padding: 20px;
+}
+
+/* Inserting this collapsed row between two flex items will make 
+* the flex item that comes after it break to a new row */
+.break {
+    width: 100%;
+    float: center;
+    height: 50px;
+}

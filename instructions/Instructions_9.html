@@ -1,0 +1,34 @@
+{{ block title }}
+
+{{ extends 'global/Progress_Bar.html' }}
+
+{{ endblock }}
+
+{{ block content }}
+
+{{ if fr }}
+<h3>{{ Lexicon.total_cash }}</h3>
+L'{{ Lexicon.total_cash }} est la somme : 1) du solde
+précédent de votre {{ Lexicon.savings_account }}, 2) des
+{{ Lexicon.interest_earned_last_period }}, et 3) de votre
+{{ Lexicon.salary }} mensuel.<br><br>
+
+<h3>Question de compréhension</h3>
+
+{{ else }}
+<h3>{{ Lexicon.total_cash }}</h3>
+{{ Lexicon.total_cash }} is the sum of 1) your previous
+{{ Lexicon.savings_account }} balance, 2) the
+{{ Lexicon.interest_earned_last_period }}, and 3) your
+monthly {{ Lexicon.salary }}.<br><br>
+
+<h3>Comprehension Question</h3>
+
+{{ endif }}
+
+{{ formfields }}
+
+{{ next_button }}
+
+
+{{ endblock }}

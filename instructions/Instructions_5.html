@@ -1,0 +1,129 @@
+{{ block title }}
+
+{{ extends 'global/Progress_Bar.html' }}
+
+{{ endblock }}
+
+{{ block content }}
+
+{{ if fr }}
+<h1>Écran de jeu</h1>
+Ajustez maintenant la quantité dans {{ Lexicon.my_cart }}
+pour que votre {{ Lexicon.stock }} contienne <b>
+    {{ C.NEW_STOCK }} {{ Lexicon.unit }}
+</b> d’{{ Lexicon.food }}, puis cliquez sur
+{{ Lexicon.finalize_purchase }}.
+
+{{ else }}
+<h1>Game Screen</h1>
+Now, adjust the quantity in {{ Lexicon.my_cart }} so that
+your {{ Lexicon.stock }} has <b>
+    {{ C.NEW_STOCK }} {{ Lexicon.unit }}
+</b> of {{ Lexicon.food }} and then click
+{{ Lexicon.finalize_purchase }}.
+
+
+{{ endif }}
+
+<!-- CSS styles -->
+{{ block styles }}
+<link rel="stylesheet" href="{{ static 'task.css' }}">
+{{ endblock }}
+
+{{ extends 'global/Game_Dashboard.html' }}
+
+<br>
+<div class="break"></div>
+<div class="break"></div>
+<div class="break"></div>
+<div class="break"></div>
+<br>
+
+<div class="flex-container">
+
+    {{ extends 'global/Catalog.html' }}
+
+    <div class="flex-child-4">
+
+        {{ extends 'global/My_Cart.html' }}
+
+        <button class="btn btn-primary">
+            {{ Lexicon.finalize_purchase }}
+            ({{ Lexicon.total }}
+            {{ if fr }} :
+            {{ else }}:
+            {{ endif }}<b><span id="cart-total"></span></b>)
+            <input type="hidden" name="q10" id="q10">
+            <input type="hidden" name="responseTime" id="responseTime" />
+        </button>
+
+        <script>
+
+            let myCart = document.getElementById('cart-body');
+            let myBalance = document.getElementById('cart-body2');
+            let cartTotal = document.getElementById('cart-total');
+            let cardInterestEarned = document.getElementById('interest-earned');
+            let cardCashOnHand = document.getElementById('total-cash');
+            let cardFinalSavings = document.getElementById('final-savings');
+            let cardFinalStock = document.getElementById('final-stock');
+            let cardNewPrice = document.getElementById('new-price');;
+
+            function cu(amount) {
+                return `${amount} ₮`;
+            }
+
+            function liveRecv(data) {
+                let html = '';
+                for (let item of data.items) {
+                    html += `
+        <tr>
+            <td>${item.name}</td>
+            <td>${item.quantity}</td>
+            <td>${cu(item.total_price.toFixed(2))}</td>
+            <td><button type="button" value="${item.sku}" onclick="removeFromCart(this)" class="btn btn-secondary">-1</button></td>
+        </tr>`;
+                }
+                myCart.innerHTML = html;
+                cartTotal.innerText = cu(data.total_price.toFixed(2));
+                cardInterestEarned.innerText = cu(data.interestEarned.toFixed(2));
+                cardCashOnHand.innerText = cu(data.cashOnHand.toFixed(2));
+                cardFinalSavings.innerText = cu(data.finalSavings.toFixed(2));
+                cardFinalStock.innerText = data.finalStock;
+                cardNewPrice.innerText = cu(data.newPrice.toFixed(2));
+
+                var stockLaura = data.finalStock;
+
+                var response_q10 = data.finalStock;
+                document.getElementById("q10").value = response_q10;
+
+            }
+
+        </script>
+    </div>
+</div>
+
+<br><br>
+
+<script>
+
+    function addToCart(ele) {
+        modifyCart(ele.value, 1);
+    }
+
+    function removeFromCart(ele) {
+        modifyCart(ele.value, -1);
+    }
+
+    function modifyCart(sku, delta) {
+        liveSend({ 'sku': sku, 'delta': delta });
+    }
+
+    document.addEventListener("DOMContentLoaded", function (event) {
+        liveSend({});
+    })
+
+</script>
+
+{{ formfield_errors 'q10' }}
+
+{{ endblock }}

@@ -1,0 +1,74 @@
+{{ block title }}
+
+{{ extends 'global/Progress_Bar.html' }}
+
+{{ endblock }}
+
+{{ block content }}
+
+{{ if fr }}
+<h1>Règles du {{ Lexicon.game }}</h1>
+Maintenant que vous avez compris comment fonctionne l'écran de
+jeu, nous allons vous expliquer les règles du jeu.<br><br>
+
+<h3>Rémunération</h3>
+Comme mentionné dans l'introduction, vous recevrez une rémunération
+supplémentaire pour l'étude en fonction de votre performance dans
+le jeu.<br><br>
+
+Votre performance est basée sur la valeur de votre compte épargne à
+la fin de chaque tour de jeu (après {{ C.NUM_PERIODS }} mois
+virtuels). Après avoir effectué les quatre tours du jeu au cours
+des quatre jours, vous recevrez la somme des 4 résultats finaux correspondants
+de votre
+{{ Lexicon.savings_account }}.<br><br>
+
+<i>Ce montant sera converti en euros (€) et ajouté à votre indemnité de
+  participation.</i><br><br>
+
+<h5>Conversion</h5>
+La monnaie du jeu est libellée en <b>₮</b>. Il existe un taux de
+conversion de : <b>{{ C.CONVERSION_FACTOR }}₮ = 1,00€</b>. Cela
+signifie que si la valeur finale du {{ Lexicon.savings_account }} du
+tour sélectionné est de {{ C.CONVERTED_EXAMPLE }}₮, vous recevrez
+{{ C.EUROS_EXAMPLE|to2 }}€ pour votre performance dans le jeu qui
+viendront s’ajouter aux {{ C.PARTICIPATION_FEE|to2 }}€ d’indemnité de
+participation.<br><br>
+
+<h3>Question de compréhension</h3>
+
+{{ else }}
+<h1>Rules of the {{ Lexicon.game }}</h1>
+Now that you understand how to operate the game screen, we will
+explain the rules of the {{ Lexicon.game }}.<br><br>
+
+<h3>Remuneration</h3>
+As mentioned in the Introduction, you will receive additional
+study remuneration based on your performance in the
+{{ Lexicon.game }}.<br><br>
+
+Your performance is based on the final value in your
+{{ Lexicon.savings_account }} at the end of the game
+(after {{ C.NUM_PERIODS }} months).
+After completing the four rounds of the {{ Lexicon.game }}
+over the four days, you will receive the sum of the 4 corresponding final
+{{ Lexicon.savings_account }} results.<br><br>
+
+<i>It will convert this amount to Euros (€) and add this value to
+  your participation fee.</i><br><br>
+
+<h5>Conversion</h5>
+The game's currency is denominated by <b>₮</b>. There is a
+conversion rate of: <b>{{ C.CONVERSION_FACTOR }}₮ = 1€</b>. This
+means that if the selected round's {{ Lexicon.savings_account }}
+value is {{ C.CONVERTED_EXAMPLE }}₮, you will receive an additional
+{{ C.EUROS_EXAMPLE }}€.<br><br>
+
+<h3>Comprehension Question</h3>
+
+{{ endif }}
+{{ formfields }}
+
+{{ next_button }}
+
+{{ endblock }}

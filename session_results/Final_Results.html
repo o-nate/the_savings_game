@@ -1,0 +1,91 @@
+{{ block title }}
+
+{{ if fr }}
+Expérience entièrement terminée
+
+{{ else }}
+Experiment Fully Complete
+
+{{ endif }}
+
+{{ endblock }}
+
+{{ block content }}
+
+{{block styles}}
+<style>
+    tr.total {
+        float: center;
+        font-weight: bold;
+    }
+
+    table {
+        table-layout: fixed;
+    }
+</style>
+{{endblock}}
+
+{{ if fr }}
+<p>
+    Vous avez maintenant terminé l'expérience.<br><br>
+    La somme totale que vous recevez du jeu est de
+    {{remuneration_task}}.<br><br>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Tour</th>
+            <th>Résultat</th>
+            <th>Résultat en euro</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1</td>
+            <td>{{task_1}}</td>
+            <td>{{task_1_euros | to2}} €</td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr class="total">
+            <td>Total</td>
+            <td>{{ remuneration_task }}</td>
+            <td>{{remuneration_task_euros | to2}} €</td>
+        </tr>
+    </tfoot>
+</table>
+Au total en euro, vous avez gagné {{ final_remuneration_euros|to2 }} € pour
+votre participation à l'expérience, y compris votre
+indemnité forfaitaire de participation.<br><br>
+Veuillez cliquer sur le bouton Suivant ci-dessous pour
+passer aux pages finales.<br><br>
+</p>
+
+{{ else }}
+<p>
+    You have now completed the experiment's <b>final session</b>.
+    <br><br>
+    The total amount you will receive from the game is
+    {{ remuneration_task }}.<br><br>
+    You also earned {{ behavioral_remuneration }} as a result of
+    your correct responses in the other tasks and questionnaires.<br><br>
+    In total, you have earned {{ final_remuneration }} for
+    your participation in the experiment, including your automatic
+    participation fee.<br><br>
+    Please, click the Next button below to proceed to the
+    concluding pages.<br><br>
+</p>
+
+{{ endif }}
+
+{{ next_button }}
+
+{{ endblock }}
+
+{{ block script }}
+<script src="{{static 'generateResultsTable.js'}}"></script>
+<script>
+    // Function to generate table with results of additional remunerated tasks
+    createTable('additional_tasks')
+</script>
+{{ endblock }}

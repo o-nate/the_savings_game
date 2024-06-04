@@ -1,0 +1,22 @@
+{{ block content }}
+
+{{ if fr }}
+<p>
+    Le solde final de votre {{ Lexicon.savings_account }} a été enregistré de {{
+    final_results }}.<br><br>
+    Vous avez maintenant terminé le {{ round_text }}. {{ Lexicon.click_next
+    }}<br><br>
+</p>
+
+{{ else }}
+<p>
+    Your final {{ Lexicon.savings_account }} balance has been recorded as {{
+    final_results }}.<br><br>
+    {{ Lexicon.completed_game_round }}<br><br>
+</p>
+
+{{ endif }}
+
+{{ next_button }}
+
+{{ endblock }}

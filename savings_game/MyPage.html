@@ -1,0 +1,232 @@
+{{ block title }}
+{{ if fr }}
+Mois {{ player.round_number }} sur {{ C.NUM_ROUNDS }}
+{{ else }}
+Month {{ player.round_number }} of {{ C.NUM_ROUNDS }}
+{{ endif }}
+{{ endblock }}
+
+{{ block content }}
+
+<!-- CSS styles -->
+{{ block styles }}
+<link rel="stylesheet" href="{{ static 'task.css' }}">
+{{ endblock }}
+
+{{ extends 'global/Game_Dashboard.html' }}
+
+<br>
+<div class="break"></div>
+<div class="break"></div>
+<div class="break"></div>
+<div class="break"></div>
+<br>
+
+<div class="flex-container">
+
+    {{ extends 'global/Catalog.html' }}
+
+    <div class="flex-child-4">
+
+        {{ extends 'global/My_Cart.html' }}
+
+        <button class="btn btn-primary" type="button" disabled
+            onclick="getData(this, buttonFinalSav.value, buttonPrice.value)"
+            id="final-purch">
+            {{ Lexicon.finalize_purchase }}
+            ({{ Lexicon.total }}
+            {{ if fr }} :
+            {{ else }}:
+            {{ endif }}<b><span id="cart-total"></span></b>)
+            <input type="hidden" name="responseTime" id="responseTime" />
+        </button>
+
+    </div>
+</div>
+
+<br><br>
+
+<script>
+
+    let myCart = document.getElementById('cart-body');
+    let myBalance = document.getElementById('cart-body2');
+    let cartTotal = document.getElementById('cart-total');
+    let cardInterestEarned = document.getElementById('interest-earned');
+    let cardCashOnHand = document.getElementById('total-cash');
+    let cardFinalSavings = document.getElementById('final-savings');
+    let cardFinalStock = document.getElementById('final-stock');
+    let cardNewPrice = document.getElementById('new-price');
+    let cardRealInterest = document.getElementById('real-interest');
+    let buttonFinalPurch = document.getElementById('final-purch');
+    let buttonFinalSav = document.getElementById('final-savings');
+    let buttonPrice = document.getElementById('new-price');
+
+    function cu(amount) {
+        return `${amount} ₮`;
+    }
+
+    function liveRecv(data) {
+        $('.btn-primary').prop("disabled", false);
+        let html = '';
+        for (let item of data.items) {
+            html += `
+<tr>
+<td>{{ Lexicon.food }}</td>
+<td>${item.quantity}</td>
+<td>${cu(item.total_price.toFixed(2))}</td>
+<td><button type="button" value="${item.sku}" onclick="removeFromCart(this)" class="btn btn-secondary">-1</button></td>
+</tr>`;
+        }
+        myCart.innerHTML = html;
+        cartTotal.innerText = cu(data.total_price.toFixed(2));
+        cardInterestEarned.innerText = cu(data.interestEarned.toFixed(2));
+        cardCashOnHand.innerText = cu(data.cashOnHand.toFixed(2));
+        cardFinalSavings.innerText = cu(data.finalSavings.toFixed(2));
+        cardFinalStock.innerText = data.finalStock;
+        buttonFinalPurch.value = data.finalStock;
+        buttonFinalSav.value = data.finalSavings;
+        cardNewPrice.innerText = cu(data.newPrice.toFixed(2));
+        buttonPrice.value = data.newPrice;
+        if (cardRealInterest !== null) cardRealInterest.innerText = data.realInterest;
+
+        var stockLaura = data.finalStock;
+
+    }
+
+    // TIMER
+    // This creates the variable that marks the start time
+    var pageTimerID = -1;
+
+    // This function automatically starts the timer when the page loads.
+    window.onload = function () {
+        if (pageTimerID == -1) {
+            pageTimerID = (new Date()).getTime();
+        }
+    }
+</script>
+
+<script>
+
+    function addToCart(ele) {
+        modifyCart(ele.value, 1);
+    }
+
+    function removeFromCart(ele) {
+        modifyCart(ele.value, -1);
+    }
+
+    function modifyCart(sku, delta) {
+        $('.btn-primary').prop("disabled", true);
+        liveSend({ 'sku': sku, 'delta': delta });
+    }
+
+    document.addEventListener("DOMContentLoaded", function (event) {
+        $('.btn-primary').prop("disabled", true);
+        liveSend({});
+    });
+
+    const btn = document.getElementById("final-purch");
+    function getData(stock, savings, price) {
+        // When finalize purchase clicked, current time recorded
+        let currentTime = (new Date()).getTime();
+        // Timer start time then subtracted from current time 
+        document.getElementById("responseTime").value = currentTime - pageTimerID;
+        if (stock.value === "0") {
+            btn.type = "button";
+            confirmModal(`{{ Lexicon.warning_final_purch }}`, function (confirm) {
+                // console.log('in_confirmModal : t_interval=',t_interval,'t_interval_active=',t_interval_active);
+                if (confirm) {
+                    if ((savings / price) < 1) {
+                        btn.type = "";
+                        stock = 0;
+                        console.log("r=true");
+                        console.log("autoclick");
+                    } else if ((savings / price) >= 1) {
+                        confirmModal(`{{ Lexicon.warning_final_purch_2 }}`, function (confirm2) {
+                            // console.log('in_confirmModal : t_interval=',t_interval,'t_interval_active=',t_interval_active);
+                            if (confirm2) {
+                                btn.type = "";
+                                stock = 0;
+                                console.log("r=true 2");
+                                console.log("autoclick 2");
+                                document.forms[0].submit();
+                            }
+                        });
+                    }
+                }
+                else {
+                }
+            });
+        } else {
+            btn.type = "";
+        }
+    };
+
+    var confirmModalDivActive = false;
+    var confirm_sup_action = function () { };
+    function confirmModal(message, callback) {
+        // console.log("confirmModal_start");
+        var confirmIndex = true;
+
+        var newMessage = message.replace(/(?:\r\n|\r|\n)/g, "<br>");
+        $('#modal_confirm_dialog_body').html("" + newMessage + "");
+        //if(confirmModalDivActive) {console.log('already active'); $('#confirm_cancle').click(); $('#modal_confirm_dialog').modal('hide'); return;}
+        console.log(confirmModalDivActive);
+        var backdrop = 'static';
+        //if(confirmModalDivActive) $('#modal_confirm_dialog').modal('hide');
+        var confirmModalDiv = new bootstrap.Modal(document.getElementById('modal_confirm_dialog'), { 'keyboard': false, 'backdrop': backdrop });
+        //$('#modal_confirm_dialog').modal('show');
+        confirmModalDiv.toggle();
+        confirmModalDivActive = true;
+        console.log($('#modal_confirm_dialog'))
+        $('#confirm_cancle').on("click", function () {
+            $('#confirm_cancle').off("click");
+            confirmModalDivActive = false;
+            if (confirmIndex) {
+                confirmIndex = false;
+                $('#modal_confirm_dialog').modal('hide');
+                callback(false);
+                confirm_sup_action();
+                confirm_sup_action = function () { };
+            }
+        });
+
+        $('#confirm_ok').on("click", function () {
+            $('#confirm_ok').off("click");
+            confirmModalDivActive = false;
+            if (confirmIndex) {
+                confirmIndex = false;
+                $('#modal_confirm_dialog').modal('hide');
+                callback(true);
+                confirm_sup_action();
+                confirm_sup_action = function () { };
+            }
+        });
+        // console.log("confirmModal_end");
+    }
+</script>
+
+<br><br><br><br>
+<div class="modal fade" style='display:none' id="modal_confirm_dialog"
+    role="dialog" aria-labelledby="modal_confirm_dialog_label"
+    aria-hidden="true" data-bs-backdrop="static" style="z-index: 8192">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:buttonface">
+                <h5 class="modal-title" id="modal_confirm_dialog_label">
+                </h5>
+            </div>
+            <div class="modal-body" style="font-size:0.9em"
+                id="modal_confirm_dialog_body" align="center">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary"
+                    data-dismiss="modal" id="confirm_ok">OK</button>
+                <button type="button" class="btn btn-secondary"
+                    data-dismiss="modal"
+                    id="confirm_cancle">{{Lexicon.cancel}}</button>
+            </div>
+        </div>
+    </div>
+</div>
+{{ endblock }}

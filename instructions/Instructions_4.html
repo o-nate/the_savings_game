@@ -1,0 +1,148 @@
+{{ block title }}
+
+{{ extends 'global/Progress_Bar.html' }}
+
+{{ endblock }}
+
+{{ block content }}
+
+{{ if fr }}
+<h1>Écran de jeu</h1>
+<h3>{{ Lexicon.ending_balances }}</h3>
+Lorsque vous choisissez la quantité d’{{ Lexicon.food }}
+dans {{ Lexicon.my_cart }}, les valeurs du
+{{ Lexicon.savings_account }} et du {{ Lexicon.stock }}
+changent.
+Cela vous aide à planifier l'avenir.<br><br>
+
+<i>Maintenant, ajustez la quantité d’{{ Lexicon.food }} dans
+    {{ Lexicon.my_cart }} pour que la valeur du
+    {{ Lexicon.savings_account }} soit de </i><b>
+    {{ C.NEW_CASH }}
+</b><i> et cliquez sur {{ Lexicon.finalize_purchase }}
+    pour continuer.</i><br><br>
+Note : Pour <b>réduire la quantité</b> dans
+{{ Lexicon.my_cart }}, cliquez sur le bouton gris intitulé
+"-1".
+
+{{ else }}
+<h1>Game Screen</h1>
+<h3>{{ Lexicon.ending_balances }}</h3>
+As you adjust the quantity of {{ Lexicon.food }} in
+{{ Lexicon.my_cart }}, the values in
+{{ Lexicon.savings_account }} and {{ Lexicon.stock }} change.
+This helps you plan for the future.<br><br>
+
+<i>Now, adjust the quantity of {{ Lexicon.food }} in
+    {{ Lexicon.my_cart }} so that the value in
+    {{ Lexicon.savings_account }} is </i>
+<b>{{ C.NEW_CASH }}</b>
+<i> and click {{ Lexicon.finalize_purchase }} to proceed.</i>
+<br><br>
+Note: To <b>reduce the quantity</b> in {{ Lexicon.my_cart }},
+click the grey button labelled "-1".
+
+{{ endif }}
+
+<!-- CSS styles -->
+{{ block styles }}
+<link rel="stylesheet" href="{{ static 'task.css' }}">
+{{ endblock }}
+
+{{ extends 'global/Game_Dashboard.html' }}
+
+<br>
+<div class="break"></div>
+<div class="break"></div>
+<div class="break"></div>
+<div class="break"></div>
+<br>
+
+<div class="flex-container">
+
+    {{ extends 'global/Catalog.html' }}
+
+    <div class="flex-child-4">
+
+        {{ extends 'global/My_Cart.html' }}
+
+        <button class="btn btn-primary">
+            {{ Lexicon.finalize_purchase }}
+            ({{ Lexicon.total }}
+            {{ if fr }} :
+            {{ else }}:
+            {{ endif }}<b><span id="cart-total"></span></b>)
+            <input type="hidden" name="q9" id="q9">
+            <input type="hidden" name="responseTime" id="responseTime" />
+        </button>
+
+        <script>
+
+            let myCart = document.getElementById('cart-body');
+            let myBalance = document.getElementById('cart-body2');
+            let cartTotal = document.getElementById('cart-total');
+            let cardInterestEarned = document.getElementById('interest-earned');
+            let cardCashOnHand = document.getElementById('total-cash');
+            let cardFinalSavings = document.getElementById('final-savings');
+            let cardFinalStock = document.getElementById('final-stock');
+            let cardNewPrice = document.getElementById('new-price');;
+
+            function cu(amount) {
+                return `${amount} ₮`;
+            }
+
+            function liveRecv(data) {
+                let html = '';
+                for (let item of data.items) {
+                    html += `
+      <tr>
+          <td>{{ Lexicon.food }}</td>
+          <td>${item.quantity}</td>
+          <td>${cu(item.total_price.toFixed(2))}</td>
+          <td><button type="button" value="${item.sku}" onclick="removeFromCart(this)" class="btn btn-secondary">-1</button></td>
+      </tr>`;
+                }
+                myCart.innerHTML = html;
+                cartTotal.innerText = cu(data.total_price.toFixed(2));
+                cardInterestEarned.innerText = cu(data.interestEarned.toFixed(2));
+                cardCashOnHand.innerText = cu(data.cashOnHand.toFixed(2));
+                cardFinalSavings.innerText = cu(data.finalSavings.toFixed(2));
+                cardFinalStock.innerText = data.finalStock;
+                cardNewPrice.innerText = cu(data.newPrice.toFixed(2));
+
+                var stockLaura = data.finalStock;
+
+                var response_q9 = data.finalSavings
+                document.getElementById("q9").value = response_q9
+
+            }
+
+        </script>
+    </div>
+</div>
+
+<br><br>
+
+<script>
+
+    function addToCart(ele) {
+        modifyCart(ele.value, 1);
+    }
+
+    function removeFromCart(ele) {
+        modifyCart(ele.value, -1);
+    }
+
+    function modifyCart(sku, delta) {
+        liveSend({ 'sku': sku, 'delta': delta });
+    }
+
+    document.addEventListener("DOMContentLoaded", function (event) {
+        liveSend({});
+    })
+
+</script>
+
+{{ formfield_errors 'q9' }}
+
+{{ endblock }}

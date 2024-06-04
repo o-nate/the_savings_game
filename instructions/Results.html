@@ -1,0 +1,42 @@
+{{ block title }}
+
+{{ extends 'global/Progress_Bar.html' }}
+
+{{ endblock }}
+
+{{ block content }}
+
+{{ if fr }}
+<p>Félicitations, vous avez terminé les instructions du jeu et
+    réussi le test de compréhension. Nous allons maintenant
+    commencer le jeu. {{ Lexicon.click_next }}
+</p>
+
+{{ else }}
+<p>Congratulations, you have completed the game instructions and
+    passed the comprehension test. We will now begin the
+    {{ Lexicon.game }}. {{ Lexicon.click_next }}
+</p>
+
+{{ endif }}
+
+<button class="btn btn-primary" onclick="endTimer()" id="button">
+    {{Lexicon.next}}
+    <input type="hidden" name="endTime" id="endTime" />
+</button>
+
+
+<script>
+    // TIMER
+    // Stop timer when next button clicked
+    function endTimer() {
+        // When finalize purchase clicked, current time recorded
+        let currentTime = (new Date()).getTime();
+        console.log(currentTime);
+        // Timer start time then subtracted from current time 
+        document.getElementById("endTime").value = currentTime;
+        console.log(document.getElementById("endTime").value);
+    }
+</script>
+
+{{ endblock }}

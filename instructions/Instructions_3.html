@@ -1,0 +1,324 @@
+{{ block title }}
+
+{{ extends 'global/Progress_Bar.html' }}
+
+{{ endblock }}
+
+{{ block content }}
+
+
+<!-- CSS styles -->
+{{ block styles }}
+<link rel="stylesheet" href="{{ static 'task.css' }}">
+{{ endblock }}
+
+
+<script>
+    var alertModalDiv;
+    $(document).ready(function () {
+        alertModalDiv = new bootstrap.Modal(document.getElementById('alertModal'), {
+        });
+
+    });
+    function alertViaModal(text) {
+        $("#alert_body").html(text);
+        alertModalDiv.toggle()
+    }
+</script>
+<!-- Modal -->
+<div class="modal fade" id="alertModal" tabindex="-1"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="alert_body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"
+                    data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ if fr }}
+<h1>Écran de jeu</h1>
+Dans cette copie de l'écran principal du jeu, certains titres sont soulignés par
+du texte en bleu. Cliquez sur les
+titres en bleu pour comprendre ce à quoi correspond chaque élément.<br><br>
+<i>Une fois que vous aurez compris tous les éléments, entraînez-vous à utiliser
+    l'écran en <b>ajoutant {{ C.QUANTITY }}
+        unités</b> d'aliments à Mon Panier et cliquez sur Finaliser l’Achat pour
+    continuer.</i><br><br>
+
+
+{{ else }}
+<h1>Game Screen</h1>
+In this example of the primary game screen, certain titles are underlined with
+blue text. Click the titles in blue to
+learn what each component is.<br><br>
+<i>Once you have understood all components, practice using the screen by
+    <b>adding {{ C.QUANTITY }} units</b> of Food to
+    My Cart and click Finalize Purchase to proceed.</i><br><br>
+
+{{ endif }}
+
+<h2>
+    <a href="#_"
+        onclick="return alertViaModal(`{{Lexicon.description_months}}`)">
+        {{ if fr }}
+        Mois 1 sur {{ C.NUM_PERIODS }}
+        {{ else }}
+        Month 1 of {{ C.NUM_PERIODS }}
+        {{ endif }}
+    </a>
+</h2>
+
+<div class="flex-container">
+    <div class="flex-child">
+        <h4>{{ Lexicon.starting_balances }}</h4>
+        <div class="card border-0">
+            <div class="card-body" style="line-height: 19px">
+                <h6 class="card-title"><b><a href="#_"
+                            onclick="return alertViaModal(`{{Lexicon.description_interest_earned_last_period}}`)">{{
+                            Lexicon.interest_earned_last_period }}</a></b>
+                </h6>
+                <p class="card-text">
+                    <span id="interest-earned"></span>
+                </p>
+            </div>
+        </div>
+
+        <div class="card border-0">
+            <div class="card-body" style="line-height: 19px">
+                <h6 class="card-title"><b><a href="#_"
+                            onclick="return alertViaModal(`{{Lexicon.description_total_cash}}`)">{{
+                            Lexicon.total_cash }}</a></b></h6>
+                <p class="card-text">
+                    <span id="total-cash"></span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-child">
+        <h4>{{ Lexicon.ending_balances }}</h4>
+        <div class="card border-0" style="padding: 1em 0 0 0">
+            <div class="card-body">
+                <h6 class="card-title"><b><a href="#_"
+                            onclick="return alertViaModal(`{{Lexicon.description_savings_account}}`)">{{
+                            Lexicon.savings_account }}</a></b></h6>
+                <p class="card-text">
+                    <span id="final-savings"></span>
+                </p>
+            </div>
+        </div>
+
+        <div class="card border-0">
+            <div class="card-body">
+                <h6 class="card-title"><b><a href="#_"
+                            onclick="return alertViaModal(`{{Lexicon.description_stock}}`)">{{
+                            Lexicon.stock
+                            }}</a></b></h6>
+                <p class="card-text">
+                    <span id="final-stock"></span> <span id="units"></span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-child-2">
+        <h4>{{ Lexicon.market_data }}</h4>
+
+        {{ if nominal }}
+
+        <div class="card border-0" style="padding: 1em 0 0 0">
+            <div class="card-body">
+                <h6 class="card-title"><b><a href="#_"
+                            onclick="return alertViaModal(`{{description_interest_rate}}`)">{{
+                            Lexicon.interest_rate
+                            }}</a></b></h6>
+                <p class="card-text">
+                    {{ nominal_interest_rate }} %
+                </p>
+            </div>
+        </div>
+
+        {{ elif real }}
+
+        <div class="card border-0" style="padding: 1em 0 0 0">
+            <div class="card-body">
+                <h6 class="card-title"><b>{{ Lexicon.real_interest_rate
+                        }}</b></h6>
+                <p class="card-text">
+                    <span id="real-interest"></span> %
+                </p>
+            </div>
+        </div>
+
+        {{ endif }}
+
+        <div class="card border-0">
+            <div class="card-body">
+                <h6 class="card-title"><b><a href="#_"
+                            onclick="return alertViaModal(`{{description_salary}}`)">{{
+                            Lexicon.salary }}</a></b></h6>
+                <p class="card-text">
+                    {{ income }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<br>
+<div class="break"></div>
+<div class="break"></div>
+<div class="break"></div>
+<div class="break"></div>
+<br>
+
+<div class="flex-container">
+    <div class="flex-child-3">
+        <h4><a href="#_"
+                onclick="return alertViaModal(`{{Lexicon.description_catalog}}`)">{{
+                Lexicon.catalog
+                }}</a></h4>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ Lexicon.food }}</h5>
+                <p>
+                    {{ Lexicon.price }}: <span id="new-price"></span>
+                </p>
+                <button type="button" value="1" onclick="addToCart(this)"
+                    class="btn btn-secondary">+1</button>
+            </div>
+        </div>
+    </div>
+    <div class="flex-child-4">
+        <h4><a href="#_"
+                onclick="return alertViaModal(`{{Lexicon.description_my_cart}}`)">{{
+                Lexicon.my_cart
+                }}</a></h4>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>{{ Lexicon.name }}</th>
+                    <th>{{ Lexicon.quantity }}</th>
+                    <th>{{ Lexicon.prix_total }}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="cart-body">
+
+            </tbody>
+        </table>
+
+
+        <p>
+            <button class="btn btn-primary">
+                {{ Lexicon.finalize_purchase }}
+                ({{ Lexicon.total }}
+                {{ if fr }} :
+                {{ else }}:
+                {{ endif }}<b><span id="cart-total"></span></b>)
+                <input type="hidden" name="q8" id="q8">
+                <input type="hidden" name="responseTime" id="responseTime" />
+            </button>
+
+            <script>
+
+                let myCart = document.getElementById('cart-body');
+                let myBalance = document.getElementById('cart-body2');
+                let cartTotal = document.getElementById('cart-total');
+                let cardInterestEarned = document.getElementById('interest-earned');
+                let cardCashOnHand = document.getElementById('total-cash');
+                let cardFinalSavings = document.getElementById('final-savings');
+                let cardFinalStock = document.getElementById('final-stock');
+                let cardNewPrice = document.getElementById('new-price');;
+
+                function cu(amount) {
+                    return `${amount} ₮`;
+                }
+
+                function liveRecv(data) {
+                    let html = '';
+                    for (let item of data.items) {
+                        html += `
+      <tr>
+          <td>{{ Lexicon.food }}</td>
+          <td>${item.quantity}</td>
+          <td>${cu(item.total_price.toFixed(2))}</td>
+          <td><button type="button" value="${item.sku}" onclick="removeFromCart(this)" class="btn btn-secondary">-1</button></td>
+      </tr>`;
+                    }
+                    myCart.innerHTML = html;
+                    cartTotal.innerText = cu(data.total_price.toFixed(2));
+                    cardInterestEarned.innerText = cu(data.interestEarned.toFixed(2));
+                    cardCashOnHand.innerText = cu(data.cashOnHand.toFixed(2));
+                    cardFinalSavings.innerText = cu(data.finalSavings.toFixed(2));
+                    cardFinalStock.innerText = data.finalStock;
+                    cardNewPrice.innerText = cu(data.newPrice.toFixed(2));
+
+                    var stockLaura = data.finalStock;
+
+                    var response_q8 = data.finalStock
+                    document.getElementById("q8").value = response_q8
+
+                }
+
+            </script>
+    </div>
+</div>
+
+<br><br>
+
+<script>
+
+    function addToCart(ele) {
+        modifyCart(ele.value, 1);
+    }
+
+    function removeFromCart(ele) {
+        modifyCart(ele.value, -1);
+    }
+
+    function modifyCart(sku, delta) {
+        liveSend({ 'sku': sku, 'delta': delta });
+    }
+
+    document.addEventListener("DOMContentLoaded", function (event) {
+        liveSend({});
+    })
+
+    const interest = document.getElementById("interest-title");
+    function getData(ele) {
+        // if (ele.value === "-1") {
+        //         btn.type = "button";
+        //         var r = alert("Warning! Your Final Stock Balance is currently less than 0. If this is a mistake, please click 'Cancel' and update your Cart. If you do not have enough Cash, please click OK to end the task. (Note: You may need to click OK twice)");
+        //         if (r == true) {
+        //             btn.type = "";
+        //             stock = 0;
+        //             console.log("r=true");
+        //             document.getElementById("final-purch").click();
+        //             console.log("autoclick");
+        //         }
+        //         else {}
+        //     } else {
+        //         btn.type = "";
+        //         console.log("4");
+        //         // alert(stock);
+        //     }
+    };
+
+</script>
+
+{{ formfield_errors 'q8' }}
+
+{{ endblock }}
