@@ -30,7 +30,11 @@ To run the Savings Game locally, open your terminal, either in your preferred co
 conda activate the_savings_game
 ```
 
-Next, execute: `otree devserver`. If successful, the following message should appear:
+Next, execute:
+```
+otree devserver
+```
+If successful, the following message should appear:
 ```
 Open your browser to http://localhost:8000/
 To quit the server, press Control+C.
