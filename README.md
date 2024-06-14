@@ -20,8 +20,10 @@ After the virtual environment creation concludes, activate it by executing the c
 To run the Savings Game locally, open your terminal, either in your preferred code-editor (IDE) or directly from your desktop, and navigate to the repository's directory (i.e. folder) in the terminal. If you created a virtual environment, first activate it using `conda activate the_savings_game`.
 
 Next, execute: `otree devserver`. If successful, the following message should appear:
-```Open your browser to http://localhost:8000/
-To quit the server, press Control+C.```
+```
+Open your browser to http://localhost:8000/
+To quit the server, press Control+C.
+```
 
 Open a web browser and navigate to the address `http://localhost:8000/`. The screen below should appear in the window.
 ![image](https://github.com/le-nate/the_savings_game/assets/99023298/e927dcb3-d6be-4091-bd96-fe6dd7213cb2)
