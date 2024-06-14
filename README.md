@@ -49,7 +49,8 @@ As describe further in the following sections, the Savings Game requires certain
 
 ## Modules
 ### The Savings Game
-`task`
+`savings_game`
+The Savings Game code is separated into an `__init__.py`, which acts at the "backend" of the program. The "frontend", which provides the user interface and is what the subjects interact with is stored in the HTML files within `savings_game`. The inflation sequences are defined in `animal_spirits.csv` and the products available in `catalog.csv`. 
 
 ### Instructions
 `instructions`
