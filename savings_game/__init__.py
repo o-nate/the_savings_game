@@ -56,6 +56,7 @@ def read_csv_inflation():
 
 
 class C(BaseConstants):
+    "Ask consumer to,purchase a certain amount of goods"
     NAME_IN_URL = "task"
     PLAYERS_PER_GROUP = None
     NUM_ROUNDS = SESSION_CONFIG_DEFAULTS["task_duration"]
@@ -88,6 +89,7 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
+    "initialises the game base page for the player"
     total_price = models.CurrencyField(initial=0)
     initial_savings = models.CurrencyField(initial=0)
     cashOnHand = models.CurrencyField(initial=0)
@@ -412,17 +414,20 @@ def determine_task_round_text(player):
 
 # PAGES
 class MyPage(Page):
+    "Opens base page for player to buy goods and see his savings balance, inflation rate, salary, stock of goods and interests recieved"
     live_method = live_method
     form_model = "player"
     form_fields = ["responseTime"]
 
     @staticmethod
     def error_message(player, value):
+        "message saying cash insufficient"
         if player.finalSavings < 0:
             return Lexicon.error_task_insufficient_cash.format(Lexicon.total_cash)
 
     @staticmethod
     def before_next_page(player: Player, timeout_happened):
+        "Moves to next round after timeout happened"
         participant = player.participant
         participant.periods_survived = player.round_number
         player.finalStock -= 1
@@ -444,6 +449,7 @@ class MyPage(Page):
 
 
 class Survey1(Page):
+    "Asks player his perception on how prices evolved"
     form_model = "player"
     form_fields = ["qualitative_estimate"]
     timeout_seconds = C.TIME_LIMIT
@@ -460,12 +466,14 @@ class Survey1(Page):
 
 
 class Survey2(Page):
+    "Asks player his perception on price evolution in %"
     form_model = "player"
     form_fields = ["inf_estimate"]
     timeout_seconds = C.TIME_LIMIT
 
     @staticmethod
     def is_displayed(player):
+        "Moves to next round ?"
         return player.round_number % 12 == 0 and player.qualitative_estimate != 0
 
     @staticmethod
@@ -476,12 +484,14 @@ class Survey2(Page):
 
 
 class Survey3(Page):
+    "Inflation expectation question"
     form_model = "player"
     form_fields = ["qualitative_expectation"]
     timeout_seconds = C.TIME_LIMIT
 
     @staticmethod
     def is_displayed(player):
+        "Show round number ?"
         return (
             player.round_number == 1
             or player.round_number % 12 == 0
@@ -496,6 +506,7 @@ class Survey3(Page):
 
 
 class Survey4(Page):
+    "Asks Player price evolution forceast for the following 12 months"
     form_model = "player"
     form_fields = ["inf_expectation"]
     timeout_seconds = C.TIME_LIMIT
@@ -516,8 +527,11 @@ class Survey4(Page):
 
 
 class Failed(Page):
+    "Message if stock of goods is 0"
+
     @staticmethod
     def is_displayed(player: Player):
+        "Asks player if he wants to survive or not when stock of goods is 0"
         return (
             player.in_round(player.round_number).finalStock < 0
             or player.in_round(player.round_number).finalSavings < 0
@@ -525,6 +539,7 @@ class Failed(Page):
 
     @staticmethod
     def app_after_this_page(player, upcoming_apps):
+        "Shows savings balance at the end of the game"
         return "session_results"
 
     @staticmethod
@@ -533,6 +548,7 @@ class Failed(Page):
 
     @staticmethod
     def before_next_page(player: Player, timeout_happened):
+        "Prepare necessary info before moving to next page"
         participant = player.participant
         participant.periods_survived = player.round_number
         print(
@@ -555,8 +571,11 @@ class Failed(Page):
 
 
 class Results(Page):
+    "Game result with savings balance at the end of period"
+
     @staticmethod
     def is_displayed(player):
+        "Determins if page should be dislayed to player"
         return player.round_number == C.NUM_ROUNDS
 
     # display final results
@@ -574,6 +593,7 @@ class Results(Page):
 
     @staticmethod
     def before_next_page(player: Player, timeout_happened):
+        "?"
         participant = player.participant
 
         participant.task_results = float(player.finalSavings)
