@@ -1,3 +1,5 @@
+"""Defines data collected and functions for the Savings Game"""
+
 import csv
 from decimal import *
 import json
@@ -33,9 +35,9 @@ def read_csv_catalog():
         f = file
         rows = [row for row in csv.DictReader(f)]
         for row in rows:
-            # all values in CSV are string unless you convert them
+            # Convert values in CSV from string to float
             row["unit_price"] = float(row["unit_price"])
-            # translate name of good
+            # Translate name of good
             row["name"] = Lexicon.food
         return rows
 
@@ -56,40 +58,48 @@ def read_csv_inflation():
 
 
 class C(BaseConstants):
-    "Ask consumer to,purchase a certain amount of goods"
+    """Experimenter-defined constants, see SESSION_CONFIG_DEFAULTS for
+    additional experiment-wide constants that may be used here."""
+
     NAME_IN_URL = "task"
     PLAYERS_PER_GROUP = None
     NUM_ROUNDS = SESSION_CONFIG_DEFAULTS["task_duration"]
     TIME_LIMIT = SESSION_CONFIG_DEFAULTS["time_limit"]
 
-    # consumption constants
+    # Consumption constants
     INITIAL_ENDOWMENT = SESSION_CONFIG_DEFAULTS["initial_endowment"]
     INCOME = SESSION_CONFIG_DEFAULTS["income"]
     INTEREST_RATE = SESSION_CONFIG_DEFAULTS["interest_rate"]
-    CONSUMPTION_RATE = 1  # amount of good consumed from stock balance each period
+    CONSUMPTION_RATE = 1  # Amount of good consumed from stock balance each period
     MONETARY_POLICY = SESSION_CONFIG_DEFAULTS["monetary_policy"]
 
-    # inflation parameters from csv
+    # Inflation parameters from csv
     INFLATION = read_csv_inflation()
     # period = ID in dict
     INFLATION_DICT = {row["period"]: row for row in INFLATION}
 
-    # list of products taken from csv file
+    # List of products taken from csv file
     PRODUCTS = read_csv_catalog()
     # SKU = 'stock keeping unit' = product ID
     PRODUCTS_DICT = {row["sku"]: row for row in PRODUCTS}
 
 
 class Subsession(BaseSubsession):
+    """Subsession not required for the standard Savings Game"""
+
     pass
 
 
 class Group(BaseGroup):
+    """Group not required for the standard Savings Game"""
+
     pass
 
 
 class Player(BasePlayer):
-    "initialises the game base page for the player"
+    """Data collected on each subject's (i.e. Player's) performance.
+    Each field represents a column in the data table."""
+
     total_price = models.CurrencyField(initial=0)
     initial_savings = models.CurrencyField(initial=0)
     cashOnHand = models.CurrencyField(initial=0)
@@ -135,6 +145,8 @@ class Player(BasePlayer):
 
 
 class Item(ExtraModel):
+    """Custom class to create product object and track its price and consumption"""
+
     player = models.Link(Player)
     sku = models.StringField()
     name = models.StringField()
@@ -217,7 +229,7 @@ def to_dict(item: Item):
 
 
 def live_method(player: Player, data):
-    """Send info to HTML components"""
+    """Send info to HTML components related to savings and consumption decisions"""
     if player.round_number == 1:
         player.newPrice = float(
             C.PRODUCTS_DICT["1"]["unit_price"]
@@ -236,7 +248,7 @@ def live_method(player: Player, data):
             ]
         )
 
-    # allows subject to add and remove from shopping cart
+    # Add and remove from shopping cart
     if "sku" in data:
         sku = data["sku"]
         delta = data["delta"]
@@ -384,7 +396,7 @@ def calculate_late_stock(player):
 
 
 def determine_errors(player):
-    """Identify which erros the subject committed"""
+    """Identify which errors the subject committed"""
     end = C.NUM_ROUNDS
     errors = ["early", "late", "excess"]
     early = average_early_stock(player)
@@ -414,26 +426,29 @@ def determine_task_round_text(player):
 
 # PAGES
 class MyPage(Page):
-    "Opens base page for player to buy goods and see his savings balance, inflation rate, salary, stock of goods and interests recieved"
+    """Main screen for player to buy goods and see their savings balance,
+    inflation rate, salary, stock of goods and interests recieved"""
+
     live_method = live_method
     form_model = "player"
     form_fields = ["responseTime"]
 
     @staticmethod
     def error_message(player, value):
-        "message saying cash insufficient"
+        "Message saying insufficient cash"
         if player.finalSavings < 0:
             return Lexicon.error_task_insufficient_cash.format(Lexicon.total_cash)
 
     @staticmethod
     def before_next_page(player: Player, timeout_happened):
-        "Moves to next round after timeout happened"
+        """Moves to next round after timeout happened"""
         participant = player.participant
         participant.periods_survived = player.round_number
         player.finalStock -= 1
 
     @staticmethod
     def vars_for_template(player: Player):
+        """Send values from this __init__ script to Django components in the HTML"""
         interest_rate = {"real": False, "nominal": True}
         task_int = {"int": False}
         if player.round_number > 1 and player.finalStock == 0:
@@ -449,49 +464,55 @@ class MyPage(Page):
 
 
 class Survey1(Page):
-    "Asks player his perception on how prices evolved"
+    """Asks player their qualitative perception of how much prices changed"""
+
     form_model = "player"
     form_fields = ["qualitative_estimate"]
     timeout_seconds = C.TIME_LIMIT
 
     @staticmethod
     def is_displayed(player):
+        """Page only displays every 12 months"""
         return player.round_number % 12 == 0
 
     @staticmethod
     def vars_for_template(player: Player):
+        """Send values from this __init__ script to Django components in the HTML"""
         return dict(
             rounds12Before=player.round_number - 11, Lexicon=Lexicon, **which_language
         )
 
 
 class Survey2(Page):
-    "Asks player his perception on price evolution in %"
+    """Asks subject their quantitative perception of inflation in %"""
+
     form_model = "player"
     form_fields = ["inf_estimate"]
     timeout_seconds = C.TIME_LIMIT
 
     @staticmethod
     def is_displayed(player):
-        "Moves to next round ?"
+        """Page only displays every 12 months if the participants responds to
+        qualitative estimate that they believe prices changed"""
         return player.round_number % 12 == 0 and player.qualitative_estimate != 0
 
     @staticmethod
     def vars_for_template(player: Player):
+        """Send values from this __init__ script to Django components in the HTML"""
         return dict(
             rounds12Before=player.round_number - 11, Lexicon=Lexicon, **which_language
         )
 
 
 class Survey3(Page):
-    "Inflation expectation question"
+    "Qualitative inflation expectation question"
     form_model = "player"
     form_fields = ["qualitative_expectation"]
     timeout_seconds = C.TIME_LIMIT
 
     @staticmethod
     def is_displayed(player):
-        "Show round number ?"
+        """Page only displays every 12 months as well as after month 1"""
         return (
             player.round_number == 1
             or player.round_number % 12 == 0
@@ -500,19 +521,23 @@ class Survey3(Page):
 
     @staticmethod
     def vars_for_template(player: Player):
+        """Send values from this __init__ script to Django components in the HTML"""
         return dict(
             rounds12Before=player.round_number - 11, Lexicon=Lexicon, **which_language
         )
 
 
 class Survey4(Page):
-    "Asks Player price evolution forceast for the following 12 months"
+    "Asks subject their quantitative expectation of inflation in %"
     form_model = "player"
     form_fields = ["inf_expectation"]
     timeout_seconds = C.TIME_LIMIT
 
     @staticmethod
     def is_displayed(player):
+        """Page only displays every 12 months as well as after month 1 if the
+        participants responds to qualitative estimate that they believe prices
+        changed"""
         return (player.round_number == 1 and player.qualitative_expectation != 0) or (
             player.round_number % 12 == 0
             and player.round_number != C.NUM_ROUNDS
@@ -521,17 +546,18 @@ class Survey4(Page):
 
     @staticmethod
     def vars_for_template(player: Player):
+        """Send values from this __init__ script to Django components in the HTML"""
         return dict(
             rounds12Before=player.round_number - 11, Lexicon=Lexicon, **which_language
         )
 
 
 class Failed(Page):
-    "Message if stock of goods is 0"
+    "Page displayed when subject fails to survive until the end of the Saving Game"
 
     @staticmethod
     def is_displayed(player: Player):
-        "Asks player if he wants to survive or not when stock of goods is 0"
+        "Displayed if subject advances with a stock or savings balance less than 0"
         return (
             player.in_round(player.round_number).finalStock < 0
             or player.in_round(player.round_number).finalSavings < 0
@@ -539,16 +565,17 @@ class Failed(Page):
 
     @staticmethod
     def app_after_this_page(player, upcoming_apps):
-        "Shows savings balance at the end of the game"
+        "Directs subject to the results app, `session_results`"
         return "session_results"
 
     @staticmethod
     def vars_for_template(player: Player):
+        """Send values from this __init__ script to Django components in the HTML"""
         return dict(Lexicon=Lexicon, **which_language)
 
     @staticmethod
     def before_next_page(player: Player, timeout_happened):
-        "Prepare necessary info before moving to next page"
+        "Store data to PARTICIPANT_FIELDS to access in other apps, like `session_resulst`"
         participant = player.participant
         participant.periods_survived = player.round_number
         print(
@@ -571,16 +598,17 @@ class Failed(Page):
 
 
 class Results(Page):
-    "Game result with savings balance at the end of period"
+    """Dsplay game results"""
 
     @staticmethod
     def is_displayed(player):
-        "Determins if page should be dislayed to player"
+        """Dislays page if game finished"""
         return player.round_number == C.NUM_ROUNDS
 
     # display final results
     @staticmethod
     def vars_for_template(player: Player):
+        """Send values from this __init__ script to Django components in the HTML"""
         round_text = determine_task_round_text(player)
         print(f"task_round: {round_text}")
 
@@ -593,7 +621,7 @@ class Results(Page):
 
     @staticmethod
     def before_next_page(player: Player, timeout_happened):
-        "?"
+        """Store data to PARTICIPANT_FIELDS to access in other apps, like `session_resulst`"""
         participant = player.participant
 
         participant.task_results = float(player.finalSavings)
