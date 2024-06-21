@@ -40,6 +40,8 @@ def read_csv_catalog():
 
 
 class C(BaseConstants):
+    "defines the url name of the page"
+
     NAME_IN_URL = "instructions"
     PLAYERS_PER_GROUP = None
     NUM_ROUNDS = 1
@@ -97,6 +99,7 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
+    "Register players answers to questions"
     # Capture time it takes to complete the Instructions
     startTime = models.FloatField(initial=0)
     endTime = models.FloatField(initial=0)
@@ -281,6 +284,7 @@ def live_method(player: Player, data):
 
 # PAGES
 class Instructions_1(Page):
+    "Defines the page instructions 1"
     form_model = "player"
     form_fields = ["startTime"]
 
@@ -290,6 +294,7 @@ class Instructions_1(Page):
 
 
 class Instructions_2(Page):
+    "Defines the page instructions 2"
     live_method = live_method
 
     @staticmethod
@@ -309,6 +314,7 @@ class Instructions_2(Page):
 
 
 class Instructions_3(Page):
+    "Defines the page instructions 3"
     live_method = live_method
     form_model = "player"
     form_fields = ["q8"]
@@ -332,6 +338,7 @@ class Instructions_3(Page):
 
     @staticmethod
     def error_message(player, values):
+        "defines an error in quantity registration for q8"
         solutions = dict(q8=C.QUANTITY)
 
         error_messages = dict(
@@ -358,6 +365,7 @@ class Instructions_3(Page):
 
 
 class Instructions_4(Page):
+    "Defines the page instructions 4"
     live_method = live_method
     form_model = "player"
     form_fields = ["q9"]
@@ -379,6 +387,7 @@ class Instructions_4(Page):
 
     @staticmethod
     def error_message(player, values):
+        "error messsage if submitted answer is in the wrong format for q9"
         solutions = dict(q9=float(C.NEW_CASH))
 
         error_messages = dict(
@@ -403,6 +412,7 @@ class Instructions_4(Page):
 
 
 class Instructions_5(Page):
+    "Defines the page instructions 5"
     live_method = live_method
     form_model = "player"
     form_fields = ["q10"]
@@ -424,6 +434,7 @@ class Instructions_5(Page):
 
     @staticmethod
     def error_message(player, values):
+        "error messsage if submitted answer is in the wrong format for q10"
         solutions = dict(q10=C.NEW_STOCK)
 
         error_messages = dict(
@@ -449,6 +460,7 @@ class Instructions_5(Page):
 
 
 class Instructions_6(Page):
+    "Defines the page instructions 6"
     form_model = "player"
     form_fields = ["q1"]
 
@@ -469,6 +481,7 @@ class Instructions_6(Page):
 
     @staticmethod
     def error_message(player, values):
+        "error messsage if submitted value doesn't match expected value for q1"
         solutions = dict(
             q1=1,
         )
@@ -488,6 +501,7 @@ class Instructions_6(Page):
 
 
 class Instructions_7(Page):
+    "Defines the page instructions 7"
     form_model = "player"
     form_fields = ["q2"]
 
@@ -528,7 +542,8 @@ class Instructions_7(Page):
 
 
 class Instructions_8(Page):
-    live_method = live_method
+    "Defines the page instructions 8"
+    live_method = live_met
     form_model = "player"
 
     @staticmethod
@@ -584,6 +599,7 @@ class Instructions_8(Page):
 
 
 class Instructions_9(Page):
+    "Defines the page instructions 9"
     live_method = live_method
     form_model = "player"
     form_fields = ["q4"]
@@ -630,6 +646,7 @@ class Instructions_9(Page):
 
 
 class Results(Page):
+    "presents result of experiment"
     form_model = "player"
     form_fields = ["endTime"]
 

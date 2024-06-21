@@ -43,6 +43,7 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
+    "Register players answers to questions"
     ## choices = [[value,label],[value,label]]
     q1 = models.IntegerField(
         label=Lexicon.session_results_q1,
@@ -93,6 +94,7 @@ def convert_to_euros(amount: float, rounding: int = 2) -> float:
 
 # PAGES
 class Final_Results(Page):
+    "shows final result of experiment"
 
     # @staticmethod
     # def js_vars(player: Player):
@@ -159,6 +161,7 @@ class Final_Results(Page):
 
 
 class Feedback(Page):
+    "Give feedback after pl yer answered all the questions"
     form_model = "player"
     form_fields = ["q1", "q2", "q3", "q5", "q6", "q4"]
 
@@ -168,6 +171,7 @@ class Feedback(Page):
 
 
 class End(Page):
+    "Shows final saving balance after experiment is complete"
 
     @staticmethod
     def vars_for_template(player: Player):
