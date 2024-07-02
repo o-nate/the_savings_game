@@ -1,4 +1,5 @@
 import csv
+from typing import List, Dict, Union, Type
 import random
 from itertools import count
 from decimal import *
@@ -26,7 +27,7 @@ which_language[LANGUAGE_CODE[:2]] = True
 instructions = {"treat": False, "control": False}
 
 
-def read_csv_catalog():
+def read_csv_catalog() -> List[Dict[str, Union[str, float]]]:
     """Convert csv with product catalog to dict"""
     with open(__name__ + "/catalog.csv", encoding="utf-8-sig") as file:
         f = file
@@ -143,8 +144,9 @@ class Player(BasePlayer):
     newPrice = models.FloatField(initial=C.PRODUCTS_DICT["1"]["unit_price"])
 
 
-def q1_choices(player):
+def q1_choices(player: Type[Player]) -> List[List[Union[int, str]]]:
     """Randomize order of choices"""
+    print("player is", type(player))
     choices = [
         [1, Lexicon.savings_account],
         [2, Lexicon.stock],
@@ -155,14 +157,14 @@ def q1_choices(player):
     return choices
 
 
-def q2_choices(player):
+def q2_choices(player: Type[Player]) -> List[List[Union[int, str]]]:
     """Randomize order of choices"""
     choices = [[1, "1"], [2, "0"], [3, "3"], [4, "120"]]
     random.shuffle(choices)
     return choices
 
 
-def q3_choices(player):
+def q3_choices(player: Type[Player]) -> List[List[Union[int, str]]]:
     """Randomize order of choices"""
     choices = [
         [1, Lexicon.no],
@@ -174,7 +176,7 @@ def q3_choices(player):
     return choices
 
 
-def q4_choices(player):
+def q4_choices(player: Type[Player]) -> List[List[Union[int, str]]]:
     """Randomize order of choices"""
     choices = [
         [1, cu(130)],
@@ -187,7 +189,7 @@ def q4_choices(player):
     return choices
 
 
-def q11_choices(player):
+def q11_choices(player: Type[Player]) -> List[List[Union[int, str]]]:
     """Randomize order of choices"""
     choices = [
         [1, Lexicon.q11_choice_1],
@@ -219,12 +221,12 @@ class Item(ExtraModel):
     newPrice = models.FloatField(initial=C.PRODUCTS_DICT["1"]["unit_price"])
 
 
-def total_price(item: Item):
+def total_price(item: Type[Item]) -> float:
     """Calculate total price of item with quantity selected"""
     return item.quantity * item.unit_price
 
 
-def to_dict(item: Item):
+def to_dict(item: Type[Item]) -> None:
     """Convert information about items into a dictionary"""
     return dict(
         sku=item.sku,
@@ -234,7 +236,7 @@ def to_dict(item: Item):
     )
 
 
-def live_method(player: Player, data):
+def live_method(player: Type[Player], data) -> None:
     """Send info to HTML components"""
     if player.round_number == 1:
         player.newPrice = float(C.PRODUCTS_DICT["1"]["unit_price"])
@@ -289,7 +291,7 @@ class Instructions_1(Page):
     form_fields = ["startTime"]
 
     @staticmethod
-    def vars_for_template(player: Player):
+    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         return dict(Lexicon=Lexicon, **which_language)
 
 
@@ -298,7 +300,7 @@ class Instructions_2(Page):
     live_method = live_method
 
     @staticmethod
-    def vars_for_template(player: Player):
+    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         interest_rate = {"real": C.REAL, "nominal": C.NOMINAL}
         task_int = {"int": C.INT}
         return dict(
@@ -320,7 +322,7 @@ class Instructions_3(Page):
     form_fields = ["q8"]
 
     @staticmethod
-    def vars_for_template(player: Player):
+    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         interest_rate = {"real": C.REAL, "nominal": C.NOMINAL}
         task_int = {"int": C.INT}
         return dict(
@@ -337,7 +339,7 @@ class Instructions_3(Page):
         )
 
     @staticmethod
-    def error_message(player, values):
+    def error_message(player: Type[Player], values) -> str:
         "defines an error in quantity registration for q8"
         solutions = dict(q8=C.QUANTITY)
 
@@ -371,7 +373,7 @@ class Instructions_4(Page):
     form_fields = ["q9"]
 
     @staticmethod
-    def vars_for_template(player: Player):
+    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         interest_rate = {"real": C.REAL, "nominal": C.NOMINAL}
         task_int = {"int": C.INT}
         return dict(
@@ -386,7 +388,7 @@ class Instructions_4(Page):
         )
 
     @staticmethod
-    def error_message(player, values):
+    def error_message(player: Type[Player], values) -> str:
         "error messsage if submitted answer is in the wrong format for q9"
         solutions = dict(q9=float(C.NEW_CASH))
 
@@ -418,7 +420,7 @@ class Instructions_5(Page):
     form_fields = ["q10"]
 
     @staticmethod
-    def vars_for_template(player: Player):
+    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         interest_rate = {"real": C.REAL, "nominal": C.NOMINAL}
         task_int = {"int": C.INT}
         return dict(
@@ -433,7 +435,7 @@ class Instructions_5(Page):
         )
 
     @staticmethod
-    def error_message(player, values):
+    def error_message(player: Type[Player], values) -> str:
         "error messsage if submitted answer is in the wrong format for q10"
         solutions = dict(q10=C.NEW_STOCK)
 
@@ -465,7 +467,7 @@ class Instructions_6(Page):
     form_fields = ["q1"]
 
     @staticmethod
-    def vars_for_template(player: Player):
+    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         interest_rate = {"real": C.REAL, "nominal": C.NOMINAL}
         task_int = {"int": C.INT}
         return dict(
@@ -480,7 +482,7 @@ class Instructions_6(Page):
         )
 
     @staticmethod
-    def error_message(player, values):
+    def error_message(player: Type[Player], values) -> str:
         "error messsage if submitted value doesn't match expected value for q1"
         solutions = dict(
             q1=1,
@@ -506,7 +508,7 @@ class Instructions_7(Page):
     form_fields = ["q2"]
 
     @staticmethod
-    def vars_for_template(player: Player):
+    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         interest_rate = {"real": C.REAL, "nominal": C.NOMINAL}
         task_int = {"int": C.INT}
         return dict(
@@ -522,7 +524,7 @@ class Instructions_7(Page):
         )
 
     @staticmethod
-    def error_message(player, values):
+    def error_message(player: Type[Player], values) -> str:
         solutions = dict(
             q2=1,
         )
@@ -543,11 +545,11 @@ class Instructions_7(Page):
 
 class Instructions_8(Page):
     "Defines the page instructions 8"
-    live_method = live_met
+    live_method = live_method
     form_model = "player"
 
     @staticmethod
-    def get_form_fields(player: Player):
+    def get_form_fields(player: Type[Player]):
         """Remove q11 about Food price change if in instructions treatment group"""
         if player.participant.instructions == "treat":
             form_fields = ["q3"]
@@ -556,7 +558,7 @@ class Instructions_8(Page):
         return form_fields
 
     @staticmethod
-    def vars_for_template(player: Player):
+    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         interest_rate = {"real": C.REAL, "nominal": C.NOMINAL}
         ## Toggle price change instructions per treatment group
         if player.participant.instructions == "treat":
@@ -575,7 +577,7 @@ class Instructions_8(Page):
         )
 
     @staticmethod
-    def error_message(player, values):
+    def error_message(player: Type[Player], values) -> str:
         if player.participant.instructions == "treat":
             solutions = dict(q3=1)
         else:
@@ -605,7 +607,7 @@ class Instructions_9(Page):
     form_fields = ["q4"]
 
     @staticmethod
-    def vars_for_template(player: Player):
+    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         ## Toggle total questions for progress bar per instructions treatment group
         interest_rate = {"real": C.REAL, "nominal": C.NOMINAL}
         task_int = {"int": C.INT}
@@ -628,7 +630,7 @@ class Instructions_9(Page):
         )
 
     @staticmethod
-    def error_message(player, values):
+    def error_message(player: Type[Player], values) -> str:
         solutions = dict(q4=1)
 
         error_messages = dict(q4=Lexicon.error_task_instructions_q4)
@@ -651,7 +653,7 @@ class Results(Page):
     form_fields = ["endTime"]
 
     @staticmethod
-    def vars_for_template(player: Player):
+    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         interest_rate = {"real": C.REAL, "nominal": C.NOMINAL}
         task_int = {"int": C.INT}
         # ## Adjust for fact that number of form_fields not counted in Instructions_8
