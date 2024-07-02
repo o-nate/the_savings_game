@@ -387,7 +387,10 @@ def calculate_late_stock(player):
     before = 12 if inflation == 1012 else 30
     after = before + 3
     end = C.NUM_ROUNDS
-    stock_up = end - before - player.in_round(before).finalStock
+    if player.round_number >= before:
+        stock_up = end - before - player.in_round(before).finalStock
+    else:
+        stock_up = 0
     if stock_up > 0:
         late = stock_up - player.in_round(after).finalStock
     else:
