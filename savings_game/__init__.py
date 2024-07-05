@@ -375,6 +375,23 @@ def average_early_stock(player):
     inflation = participant.inflation[current_round - 1]
     before = 12 if inflation == 1012 else 30
     stock_values = [v.finalStock for v in player.in_rounds(1, before)]
+    print(player.in_round(1).finalStock)
+    print("stock values", stock_values)
+    if -1 in stock_values:
+
+        stock_values = [100 if v == -1 else v for v in stock_values]
+
+        b_index = stock_values.index(100)
+        if b_index != -1:
+            for i in range(b_index + 1, len(stock_values)):
+                if stock_values[i] == 0:
+                    stock_values[i] = None
+                else:
+                    break
+            # Supprimer les None
+            stock_values = [v for v in stock_values if v is not None]
+
+        print("adjusted stock values", stock_values)
     average_stock = statistics.mean(stock_values)
     return average_stock
 
@@ -403,7 +420,9 @@ def determine_errors(player):
     end = C.NUM_ROUNDS
     errors = ["early", "late", "excess"]
     early = average_early_stock(player)
+    print("first error", early)
     late = calculate_late_stock(player)
+    print("second error", late)
     excess = player.in_round(end).finalStock
     error_dict = {error: amount for error, amount in zip(errors, [early, late, excess])}
     return error_dict
@@ -598,6 +617,7 @@ class Failed(Page):
         current_round = participant.round
         setattr(participant, f"errors_{current_round}", error_dict)
         print(getattr(participant, f"errors_{current_round}"))
+        print("this is the error", error_dict)
 
 
 class Results(Page):
