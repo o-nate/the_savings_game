@@ -44,10 +44,10 @@ Open a web browser and navigate to the address `http://localhost:8000/`. The scr
 
 ![image](https://github.com/le-nate/the_savings_game/assets/99023298/e927dcb3-d6be-4091-bd96-fe6dd7213cb2)
 
-### Testing
+## Testing
 As describe further in the following sections, the Savings Game requires certain variables (e.g. the inflation sequence) be defined in order to run. When in production (i.e. when an experiment is actively being conducted) these variables will be defined outside of the Savings Game itself. So, when testing, we must define them manually. These variables get assigned by a module `filler`, which executes prior to the Savings Game task when you click on `The Savings Game` or `The Savings Game (Standalone)`. We explain how to adjust these variables in the later sections. For now, you just need to know that this means that when testing, a page will appear beforehand saying "This is a blank page required during testing to set certain participant_field values prior to beginning." This message is not intended to appear during an experiment.
 
-## Modules
+## Apps
 ### The Savings Game
 `savings_game`
 The Savings Game code is separated into an `__init__.py`, which acts at the "backend" of the program. The "frontend", which provides the user interface and is what the subjects interact with is stored in the HTML files within `savings_game`. The inflation sequences are defined in `animal_spirits.csv` and the products available in `catalog.csv`. 
@@ -58,7 +58,9 @@ The Savings Game code is separated into an `__init__.py`, which acts at the "bac
 ### Results
 `session_results`
 
+### Filler (For testing and debugging purposes only)
 `filler`
 
-
+## Settings
+Setting can be defined in two places, either in the experiment-wide `SESSION_CONFIG_DEFAULTS` dictionary in `settings.py` or in the `C` class of the `__init__.py` file for a specific app. Settings defined in `SESSION_CONFIG_DEFAULTS` apply across all apps in the experiment. Settings defined in the `C` class of an app are app-specific.
 
