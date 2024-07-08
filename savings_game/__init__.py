@@ -73,6 +73,9 @@ class C(BaseConstants):
     CONSUMPTION_RATE = 1  # Amount of good consumed from stock balance each period
     MONETARY_POLICY = SESSION_CONFIG_DEFAULTS["monetary_policy"]
 
+    # Define window for calculating late stock
+    LATE_WINDOW = 3
+
     # Inflation parameters from csv
     INFLATION = read_csv_inflation()
     # period = ID in dict
@@ -391,12 +394,16 @@ def calculate_late_stock(player):
     current_round = participant.round
     inflation = participant.inflation[current_round - 1]
     before = 12 if inflation == 1012 else 30
-    after = before + 3
+    after = before + C.LATE_WINDOW
     end = C.NUM_ROUNDS
     if player.round_number >= before:
         stock_up = end - before - player.in_round(before).finalStock
     else:
         stock_up = 0
+    # Adjust late stock with pre-defined window of time for subjects
+    # to recognize inflation change
+    if stock_up > 0 and player.in_round(after).finalStock == -1:
+        late = stock_up - player.in_round(after).finalStock
     if stock_up > 0:
         late = stock_up - player.in_round(after).finalStock
     else:

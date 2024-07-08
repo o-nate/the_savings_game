@@ -55,7 +55,7 @@ class Filler(Page):
         print("round:", player.participant.round)
         player.participant.task_results_1 = 1000
         print("task_results_1:", player.participant.task_results_1)
-        player.participant.inflation = [430, 430]
+        player.participant.inflation = [1012, 430]
         print("inflation: ", player.participant.inflation)
 
 
