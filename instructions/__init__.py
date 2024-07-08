@@ -226,7 +226,7 @@ def total_price(item: Type[Item]) -> float:
     return item.quantity * item.unit_price
 
 
-def to_dict(item: Type[Item]) -> None:
+def to_dict(item: Type[Item]) -> Dict[str, Union[str, int, float]]:
     """Convert information about items into a dictionary"""
     return dict(
         sku=item.sku,
@@ -236,7 +236,13 @@ def to_dict(item: Type[Item]) -> None:
     )
 
 
-def live_method(player: Type[Player], data) -> None:
+def live_method(player: Type[Player], data) -> Dict[
+    str,
+    Dict[
+        str,
+        Union[Dict[str, Union[str, int, Type[Currency]]], float, int, Type[Currency]],
+    ],
+]:
     """Send info to HTML components"""
     if player.round_number == 1:
         player.newPrice = float(C.PRODUCTS_DICT["1"]["unit_price"])
@@ -300,7 +306,9 @@ class Instructions_2(Page):
     live_method = live_method
 
     @staticmethod
-    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
+    def vars_for_template(
+        player: Type[Player],
+    ) -> Dict[str, Union[Type[Currency], float, str, bool]]:
         interest_rate = {"real": C.REAL, "nominal": C.NOMINAL}
         task_int = {"int": C.INT}
         return dict(
@@ -322,7 +330,9 @@ class Instructions_3(Page):
     form_fields = ["q8"]
 
     @staticmethod
-    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
+    def vars_for_template(
+        player: Type[Player],
+    ) -> Dict[str, Union[Type[Currency], float, str, bool]]:
         interest_rate = {"real": C.REAL, "nominal": C.NOMINAL}
         task_int = {"int": C.INT}
         return dict(
@@ -339,7 +349,7 @@ class Instructions_3(Page):
         )
 
     @staticmethod
-    def error_message(player: Type[Player], values) -> str:
+    def error_message(player: Type[Player], values) -> Dict[str, str]:
         "defines an error in quantity registration for q8"
         solutions = dict(q8=C.QUANTITY)
 
@@ -373,7 +383,9 @@ class Instructions_4(Page):
     form_fields = ["q9"]
 
     @staticmethod
-    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
+    def vars_for_template(
+        player: Type[Player],
+    ) -> Dict[str, Union[Type[Currency], float, str, bool]]:
         interest_rate = {"real": C.REAL, "nominal": C.NOMINAL}
         task_int = {"int": C.INT}
         return dict(
@@ -388,7 +400,7 @@ class Instructions_4(Page):
         )
 
     @staticmethod
-    def error_message(player: Type[Player], values) -> str:
+    def error_message(player: Type[Player], values) -> Dict[str, str]:
         "error messsage if submitted answer is in the wrong format for q9"
         solutions = dict(q9=float(C.NEW_CASH))
 
@@ -420,7 +432,9 @@ class Instructions_5(Page):
     form_fields = ["q10"]
 
     @staticmethod
-    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
+    def vars_for_template(
+        player: Type[Player],
+    ) -> Dict[str, Union[Type[Currency], float, str, bool]]:
         interest_rate = {"real": C.REAL, "nominal": C.NOMINAL}
         task_int = {"int": C.INT}
         return dict(
@@ -467,7 +481,9 @@ class Instructions_6(Page):
     form_fields = ["q1"]
 
     @staticmethod
-    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
+    def vars_for_template(
+        player: Type[Player],
+    ) -> Dict[str, Union[Type[Currency], float, str, bool]]:
         interest_rate = {"real": C.REAL, "nominal": C.NOMINAL}
         task_int = {"int": C.INT}
         return dict(
@@ -508,7 +524,9 @@ class Instructions_7(Page):
     form_fields = ["q2"]
 
     @staticmethod
-    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
+    def vars_for_template(
+        player: Type[Player],
+    ) -> Dict[str, Union[Type[Currency], float, str, bool]]:
         interest_rate = {"real": C.REAL, "nominal": C.NOMINAL}
         task_int = {"int": C.INT}
         return dict(
@@ -558,7 +576,9 @@ class Instructions_8(Page):
         return form_fields
 
     @staticmethod
-    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
+    def vars_for_template(
+        player: Type[Player],
+    ) -> Dict[str, Union[Type[Currency], float, str, bool]]:
         interest_rate = {"real": C.REAL, "nominal": C.NOMINAL}
         ## Toggle price change instructions per treatment group
         if player.participant.instructions == "treat":
@@ -607,7 +627,9 @@ class Instructions_9(Page):
     form_fields = ["q4"]
 
     @staticmethod
-    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
+    def vars_for_template(
+        player: Type[Player],
+    ) -> Dict[str, Union[Type[Currency], float, str, bool]]:
         ## Toggle total questions for progress bar per instructions treatment group
         interest_rate = {"real": C.REAL, "nominal": C.NOMINAL}
         task_int = {"int": C.INT}
@@ -653,7 +675,9 @@ class Results(Page):
     form_fields = ["endTime"]
 
     @staticmethod
-    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
+    def vars_for_template(
+        player: Type[Player],
+    ) -> Dict[str, Union[Type[Currency], float, str, bool]]:
         interest_rate = {"real": C.REAL, "nominal": C.NOMINAL}
         task_int = {"int": C.INT}
         # ## Adjust for fact that number of form_fields not counted in Instructions_8
