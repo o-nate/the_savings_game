@@ -420,8 +420,7 @@ def determine_errors(player):
     late = calculate_late_stock(player)
     print("second error", late)
     excess = player.in_round(end).finalStock
-    error_dict = {error: amount for error, amount in zip(errors, [early, late, excess])}
-    return error_dict
+    return dict(zip(errors, [early, late, excess]))
 
 
 def determine_task_round_text(player):
