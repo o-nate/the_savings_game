@@ -378,19 +378,8 @@ def average_early_stock(player):
     print(player.in_round(1).finalStock)
     print("stock values", stock_values)
     if -1 in stock_values:
-
-        stock_values = [100 if v == -1 else v for v in stock_values]
-
-        b_index = stock_values.index(100)
-        if b_index != -1:
-            for i in range(b_index + 1, len(stock_values)):
-                if stock_values[i] == 0:
-                    stock_values[i] = None
-                else:
-                    break
-            # Supprimer les None
-            stock_values = [v for v in stock_values if v is not None]
-
+        b_index = stock_values.index(-1)
+        stock_values = stock_values[:b_index]
         print("adjusted stock values", stock_values)
     average_stock = statistics.mean(stock_values)
     return average_stock
