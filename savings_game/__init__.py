@@ -1,6 +1,7 @@
 """Defines data collected and functions for the Savings Game"""
 
 import csv
+from typing import List, Dict, Union, Type
 from decimal import *
 import json
 import random
@@ -29,7 +30,7 @@ which_language = {"en": False, "fr": False}  # noqa
 which_language[LANGUAGE_CODE[:2]] = True
 
 
-def read_csv_catalog():
+def read_csv_catalog() -> List[Dict[str, Union[str, float]]]:
     """Convert csv with product catalog to dict"""
     with open(__name__ + "/catalog.csv", encoding="utf-8-sig") as file:
         f = file
@@ -42,7 +43,7 @@ def read_csv_catalog():
         return rows
 
 
-def read_csv_inflation():
+def read_csv_inflation() -> List[Dict[str, Union[str, float]]]:
     """Convert csv with inflation to dict"""
     with open(__name__ + "/animal_spirits.csv", encoding="utf-8-sig") as file:
         f = file
@@ -158,7 +159,7 @@ class Item(ExtraModel):
     newPrice = models.FloatField()
 
 
-def custom_export(players):
+def custom_export(players) -> None:
     """Export Item table"""
 
     yield [
@@ -195,7 +196,9 @@ def custom_export(players):
         ]
 
 
-def qualitative_expectation_choices(player):
+def qualitative_expectation_choices(
+    player: Type[Player],
+) -> List[List[Union[int, str]]]:
     """Change answer options for Month 1 versus others"""
     if player.round_number == 1:
         choices = [
@@ -216,12 +219,12 @@ def qualitative_expectation_choices(player):
     return choices
 
 
-def total_price(item: Item):
+def total_price(item: Type[Item]) -> float:
     """Calculate total price of item with quantity selected"""
     return item.quantity * item.unit_price
 
 
-def to_dict(item: Item):
+def to_dict(item: Type[Item]) -> Dict[str, Union[str, int, float]]:
     """Convert information about items into a dictionary"""
     return dict(
         sku=item.sku,
@@ -231,7 +234,7 @@ def to_dict(item: Item):
     )
 
 
-def live_method(player: Player, data):
+def live_method(player: Player, data) -> None:
     """Send info to HTML components related to savings and consumption decisions"""
     if player.round_number == 1:
         player.newPrice = float(
@@ -371,7 +374,7 @@ def live_method(player: Player, data):
     }
 
 
-def average_early_stock(player):
+def average_early_stock(player: Type[Player]) -> float:
     """Calculate average stock before first high inflation phase"""
     participant = player.participant
     current_round = participant.round
@@ -388,7 +391,7 @@ def average_early_stock(player):
     return average_stock
 
 
-def calculate_late_stock(player):
+def calculate_late_stock(player: Type[Player]) -> int:
     """Determine how many units were purchase late"""
     participant = player.participant
     current_round = participant.round
@@ -411,7 +414,7 @@ def calculate_late_stock(player):
     return late
 
 
-def determine_errors(player):
+def determine_errors(player: Type[Player]) -> Dict[str, float]:
     """Identify which errors the subject committed"""
     end = C.NUM_ROUNDS
     errors = ["early", "late", "excess"]
@@ -423,7 +426,7 @@ def determine_errors(player):
     return dict(zip(errors, [early, late, excess]))
 
 
-def determine_task_round_text(player):
+def determine_task_round_text(player: Type[Player]) -> str:
     """Determine which round the subject is currently on"""
     task_round = player.participant.round
     if task_round == SESSION_CONFIG_DEFAULTS["exp_length_rounds"]:
@@ -447,6 +450,7 @@ class MyPage(Page):
     inflation rate, salary, stock of goods and interests recieved"""
 
     live_method = live_method
+    print("yes", type(live_method))
     form_model = "player"
     form_fields = ["responseTime"]
 
@@ -457,14 +461,14 @@ class MyPage(Page):
             return Lexicon.error_task_insufficient_cash.format(Lexicon.total_cash)
 
     @staticmethod
-    def before_next_page(player: Player, timeout_happened):
+    def before_next_page(player: Type[Player], timeout_happened: bool) -> None:
         """Moves to next round after timeout happened"""
         participant = player.participant
         participant.periods_survived = player.round_number
         player.finalStock -= 1
 
     @staticmethod
-    def vars_for_template(player: Player):
+    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         """Send values from this __init__ script to Django components in the HTML"""
         interest_rate = {"real": False, "nominal": True}
         task_int = {"int": False}
@@ -488,12 +492,12 @@ class Survey1(Page):
     timeout_seconds = C.TIME_LIMIT
 
     @staticmethod
-    def is_displayed(player):
+    def is_displayed(player: Type[Player]) -> bool:
         """Page only displays every 12 months"""
         return player.round_number % 12 == 0
 
     @staticmethod
-    def vars_for_template(player: Player):
+    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         """Send values from this __init__ script to Django components in the HTML"""
         return dict(
             rounds12Before=player.round_number - 11, Lexicon=Lexicon, **which_language
@@ -508,13 +512,13 @@ class Survey2(Page):
     timeout_seconds = C.TIME_LIMIT
 
     @staticmethod
-    def is_displayed(player):
+    def is_displayed(player) -> None:
         """Page only displays every 12 months if the participants responds to
         qualitative estimate that they believe prices changed"""
         return player.round_number % 12 == 0 and player.qualitative_estimate != 0
 
     @staticmethod
-    def vars_for_template(player: Player):
+    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         """Send values from this __init__ script to Django components in the HTML"""
         return dict(
             rounds12Before=player.round_number - 11, Lexicon=Lexicon, **which_language
@@ -528,7 +532,7 @@ class Survey3(Page):
     timeout_seconds = C.TIME_LIMIT
 
     @staticmethod
-    def is_displayed(player):
+    def is_displayed(player: Type[Player]) -> bool:
         """Page only displays every 12 months as well as after month 1"""
         return (
             player.round_number == 1
@@ -537,7 +541,7 @@ class Survey3(Page):
         )
 
     @staticmethod
-    def vars_for_template(player: Player):
+    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         """Send values from this __init__ script to Django components in the HTML"""
         return dict(
             rounds12Before=player.round_number - 11, Lexicon=Lexicon, **which_language
@@ -551,7 +555,7 @@ class Survey4(Page):
     timeout_seconds = C.TIME_LIMIT
 
     @staticmethod
-    def is_displayed(player):
+    def is_displayed(player: Type[Player]) -> bool:
         """Page only displays every 12 months as well as after month 1 if the
         participants responds to qualitative estimate that they believe prices
         changed"""
@@ -562,7 +566,7 @@ class Survey4(Page):
         )
 
     @staticmethod
-    def vars_for_template(player: Player):
+    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         """Send values from this __init__ script to Django components in the HTML"""
         return dict(
             rounds12Before=player.round_number - 11, Lexicon=Lexicon, **which_language
@@ -573,7 +577,7 @@ class Failed(Page):
     "Page displayed when subject fails to survive until the end of the Saving Game"
 
     @staticmethod
-    def is_displayed(player: Player):
+    def is_displayed(player: Type[Player]) -> bool:
         "Displayed if subject advances with a stock or savings balance less than 0"
         return (
             player.in_round(player.round_number).finalStock < 0
@@ -581,17 +585,19 @@ class Failed(Page):
         )
 
     @staticmethod
-    def app_after_this_page(player, upcoming_apps):
+    def app_after_this_page(
+        player: Type[Player], upcoming_apps: List[str]
+    ) -> Union[str, None]:
         "Directs subject to the results app, `session_results`"
         return "session_results"
 
     @staticmethod
-    def vars_for_template(player: Player):
+    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         """Send values from this __init__ script to Django components in the HTML"""
         return dict(Lexicon=Lexicon, **which_language)
 
     @staticmethod
-    def before_next_page(player: Player, timeout_happened):
+    def before_next_page(player: Type[Player], timeout_happened: bool) -> None:
         "Store data to PARTICIPANT_FIELDS to access in other apps, like `session_resulst`"
         participant = player.participant
         participant.periods_survived = player.round_number
@@ -619,13 +625,13 @@ class Results(Page):
     """Dsplay game results"""
 
     @staticmethod
-    def is_displayed(player):
+    def is_displayed(player: Type[Player]) -> bool:
         """Dislays page if game finished"""
         return player.round_number == C.NUM_ROUNDS
 
     # display final results
     @staticmethod
-    def vars_for_template(player: Player):
+    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         """Send values from this __init__ script to Django components in the HTML"""
         round_text = determine_task_round_text(player)
         print(f"task_round: {round_text}")
@@ -638,7 +644,7 @@ class Results(Page):
         )
 
     @staticmethod
-    def before_next_page(player: Player, timeout_happened):
+    def before_next_page(player: Type[Player], timeout_happened: bool) -> None:
         """Store data to PARTICIPANT_FIELDS to access in other apps, like `session_resulst`"""
         participant = player.participant
 
