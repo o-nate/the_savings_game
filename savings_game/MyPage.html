@@ -38,7 +38,7 @@ Month {{ player.round_number }} of {{ C.NUM_ROUNDS }}
             {{ if fr }} :
             {{ else }}:
             {{ endif }}<b><span id="cart-total"></span></b>)
-            <input type="hidden" name="responseTime" id="responseTime" />
+            <input type="hidden" name="response_time" id="responseTime" />
         </button>
 
     </div>
@@ -79,17 +79,17 @@ Month {{ player.round_number }} of {{ C.NUM_ROUNDS }}
         }
         myCart.innerHTML = html;
         cartTotal.innerText = cu(data.total_price.toFixed(2));
-        cardInterestEarned.innerText = cu(data.interestEarned.toFixed(2));
-        cardCashOnHand.innerText = cu(data.cashOnHand.toFixed(2));
-        cardFinalSavings.innerText = cu(data.finalSavings.toFixed(2));
-        cardFinalStock.innerText = data.finalStock;
-        buttonFinalPurch.value = data.finalStock;
-        buttonFinalSav.value = data.finalSavings;
-        cardNewPrice.innerText = cu(data.newPrice.toFixed(2));
-        buttonPrice.value = data.newPrice;
-        if (cardRealInterest !== null) cardRealInterest.innerText = data.realInterest;
+        cardInterestEarned.innerText = cu(data.interest_earned.toFixed(2));
+        cardCashOnHand.innerText = cu(data.cash_on_hand.toFixed(2));
+        cardFinalSavings.innerText = cu(data.final_savings.toFixed(2));
+        cardFinalStock.innerText = data.final_stock;
+        buttonFinalPurch.value = data.final_stock;
+        buttonFinalSav.value = data.final_savings;
+        cardNewPrice.innerText = cu(data.new_price.toFixed(2));
+        buttonPrice.value = data.new_price;
+        if (cardRealInterest !== null) cardRealInterest.innerText = data.real_interest;
 
-        var stockLaura = data.finalStock;
+        var stockLaura = data.final_stock;
 
     }
 

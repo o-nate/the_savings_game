@@ -106,16 +106,16 @@ class Player(BasePlayer):
 
     total_price = models.CurrencyField(initial=0)
     initial_savings = models.CurrencyField(initial=0)
-    cashOnHand = models.CurrencyField(initial=0)
-    finalSavings = models.CurrencyField(initial=0)
-    finalStock = models.IntegerField(initial=0)
-    interestEarned = models.CurrencyField(initial=0)
+    cash_on_hand = models.CurrencyField(initial=0)
+    final_savings = models.CurrencyField(initial=0)
+    final_stock = models.IntegerField(initial=0)
+    interest_earned = models.CurrencyField(initial=0)
     decision = models.LongStringField(initial="")
-    newPrice = models.FloatField(initial=C.PRODUCTS_DICT["1"]["unit_price"])
-    realInterest = models.FloatField()
+    new_price = models.FloatField(initial=C.PRODUCTS_DICT["1"]["unit_price"])
+    real_interest = models.FloatField()
 
     # Response time
-    responseTime = models.FloatField(initial=0)
+    response_time = models.FloatField(initial=0)
 
     # Inflation estimates
     qualitative_estimate = models.IntegerField(
