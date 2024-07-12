@@ -156,7 +156,7 @@ class Item(ExtraModel):
     name = models.StringField()
     quantity = models.IntegerField()
     unit_price = models.CurrencyField()
-    newPrice = models.FloatField()
+    new_price = models.FloatField()
 
 
 def custom_export(players) -> None:
@@ -182,7 +182,7 @@ def custom_export(players) -> None:
         name = item.name
         quantity = item.quantity
         unit_price = item.unit_price
-        new_price = item.newPrice
+        new_price = item.new_price
         session = player.session
         yield [
             session.code,
@@ -219,6 +219,63 @@ def qualitative_expectation_choices(
     return choices
 
 
+def calculate_price(player: Player) -> float:
+    """Calculate new price of good based on inflation and round in Savings Game"""
+    if player.round_number == 1:
+        pass
+    else:
+        pass
+
+
+def change_quantity_in_cart(data_from_click: Dict[str, Union[str, int]]) -> None:
+    """
+    Adjust quantity in shopping cart based on the button clicked (+1 or -1) and
+    whether or not the item is already in the shopping cart
+    """
+
+
+def calculate_initial_savings(player: Player) -> float:
+    """Calculate savings held at beginning of new period"""
+    if player.round_number == 1:
+        return C.INITIAL_ENDOWMENT
+    return player.in_round(player.round_number - 1).final_savings * (
+        1
+        + (
+            C.INTEREST_RATE
+            + (
+                C.MONETARY_POLICY
+                * C.INFLATION_DICT[player.round_number - 1][
+                    str(player.participant.inflation[(player.participant.round - 1)])
+                ]
+            )
+        )
+    )
+
+
+def calculate_final_stock(player: Player) -> float:
+    """Calculate stock held prior to clicking advance"""
+    if player.round_number == 1:
+        pass
+    else:
+        pass
+
+
+def calculate_interest_earned(player: Player) -> float:
+    """Calculate interest earned on savings from prior period"""
+    if player.round_number == 1:
+        pass
+    else:
+        pass
+
+
+def calculate_real_interest(player: Player) -> float:
+    """Calculate real interest rate (rather than nominal)"""
+    if player.round_number == 1:
+        pass
+    else:
+        pass
+
+
 def total_price(item: Type[Item]) -> float:
     """Calculate total price of item with quantity selected"""
     return item.quantity * item.unit_price
@@ -234,10 +291,13 @@ def to_dict(item: Type[Item]) -> Dict[str, Union[str, int, float]]:
     )
 
 
-def live_method(player: Player, data) -> None:
+def live_method(player: Player, data: Dict[str, int]) -> None:
     """Send info to HTML components related to savings and consumption decisions"""
+    # TODO replace with function calculate_price
+    # * Calculate new price
     if player.round_number == 1:
-        player.newPrice = float(
+        # * If first month, use original price from C.PRODUCTS_DICT["1"]["unit_price"]
+        player.new_price = float(
             C.PRODUCTS_DICT["1"]["unit_price"]
             * (
                 1
@@ -247,44 +307,63 @@ def live_method(player: Player, data) -> None:
             )
         )
     else:
-        player.newPrice = player.in_round(player.round_number - 1).newPrice * (
+        # * If after first month, use price from previous month
+        player.new_price = player.in_round(player.round_number - 1).new_price * (
             1
             + C.INFLATION_DICT[player.round_number][
                 str(player.participant.inflation[(player.participant.round - 1)])
             ]
         )
 
-    # Add and remove from shopping cart
+    # TODO replace with change_quantity_in_cart function
+    # * Add and remove from shopping cart
     if "sku" in data:
+        # * If buttons +1 or -1 clicked to adjust quantity in shopping cart, determine ...
+        print("data", data)
+        # * ... which product
         sku = data["sku"]
+        # * ... if added or removed from cart
         delta = data["delta"]
-        product = C.PRODUCTS_DICT[sku]
         matches = Item.filter(player=player, sku=sku)
+        print("matches", matches)
+        # * If quantity already in cart ...
         if matches:
+            # * ... adjust quantity based on button clicked (+1 or -1)
             [item] = matches
+            print("item.quantity", item.quantity)
             item.quantity += delta
+            # * If last quantity in cart, remove item from cart
             if item.quantity <= 0:
                 item.delete()
+        # * If not already in cart, create new item in cart
         else:
-            if delta > 0:
-                Item.create(
-                    player=player,
-                    quantity=delta,
-                    sku=sku,
-                    name=product["name"],
-                    unit_price=player.newPrice,
-                )
+            Item.create(
+                player=player,
+                quantity=delta,
+                sku=sku,
+                name=C.PRODUCTS_DICT[sku]["name"],
+                unit_price=player.new_price,
+            )
 
     items = Item.filter(player=player)
     item_dicts = [to_dict(item) for item in items]
+
+    # * Calculate the total price paid
     player.total_price = sum([total_price(item) for item in items])
+
+    # * Calculate final_savings, final_stock, interest_earned, real_interest
+    # * If first month ...
+    player.initial_savings = calculate_initial_savings(player)
+    # TODO replace with calculate_final_stock function
+    # TODO replace with calculate_interest_earned
+    # TODO replace with calculate_real_interest
     if player.round_number == 1:
-        # fetch previous period's final savings
-        player.initial_savings = C.INITIAL_ENDOWMENT
-        # fetch previous period's final stock
-        player.finalStock = sum([item.quantity for item in items])
-        player.interestEarned = 0
-        player.realInterest = round(
+        # * Use initial quantity purchased for final_stock
+        player.final_stock = sum([item.quantity for item in items])
+        # * Calculate interest rate (without monetary policy)
+        player.interest_earned = 0
+        # * Calculate real (rather than nominal) interest rate
+        player.real_interest = round(
             100
             * (
                 C.INTEREST_RATE
@@ -295,28 +374,13 @@ def live_method(player: Player, data) -> None:
             2,
         )
     else:
-        player.initial_savings = player.in_round(
-            player.round_number - 1
-        ).finalSavings * (
-            1
-            + (
-                C.INTEREST_RATE
-                + (
-                    C.MONETARY_POLICY
-                    * C.INFLATION_DICT[player.round_number - 1][
-                        str(
-                            player.participant.inflation[(player.participant.round - 1)]
-                        )
-                    ]
-                )
-            )
-        )
-        player.finalStock = player.in_round(player.round_number - 1).finalStock + sum(
+        # * Fetch previous period's final stock and add new quantity purchased
+        player.final_stock = player.in_round(player.round_number - 1).final_stock + sum(
             [item.quantity for item in items]
         )
-        player.interestEarned = player.in_round(
+        player.interest_earned = player.in_round(
             player.round_number - 1
-        ).finalSavings * (
+        ).final_savings * (
             C.INTEREST_RATE
             + (
                 C.MONETARY_POLICY
@@ -325,7 +389,7 @@ def live_method(player: Player, data) -> None:
                 ]
             )
         )
-        player.realInterest = round(
+        player.real_interest = round(
             100
             * (
                 (
@@ -347,9 +411,9 @@ def live_method(player: Player, data) -> None:
             ),
             2,
         )
-    player.cashOnHand = player.initial_savings + C.INCOME
-    player.finalSavings = player.cashOnHand - player.total_price
-    player.newPrice = player.newPrice
+    player.cash_on_hand = player.initial_savings + C.INCOME
+    player.final_savings = player.cash_on_hand - player.total_price
+    player.new_price = player.new_price
     player.decision = json.dumps(
         {
             "item": [item.sku for item in items],
@@ -363,13 +427,13 @@ def live_method(player: Player, data) -> None:
             items=item_dicts,
             total_price=player.total_price,
             initial_savings=player.initial_savings,
-            interestEarned=player.interestEarned,
-            cashOnHand=player.cashOnHand,
-            finalSavings=player.finalSavings,
-            finalStock=player.finalStock,
+            interest_earned=player.interest_earned,
+            cash_on_hand=player.cash_on_hand,
+            final_savings=player.final_savings,
+            final_stock=player.final_stock,
             decision=player.decision,
-            newPrice=player.newPrice,
-            realInterest=player.realInterest,
+            new_price=player.new_price,
+            real_interest=player.real_interest,
         )
     }
 
@@ -380,13 +444,10 @@ def average_early_stock(player: Type[Player]) -> float:
     current_round = participant.round
     inflation = participant.inflation[current_round - 1]
     before = 12 if inflation == 1012 else 30
-    stock_values = [v.finalStock for v in player.in_rounds(1, before)]
-    print(player.in_round(1).finalStock)
-    print("stock values", stock_values)
+    stock_values = [v.final_stock for v in player.in_rounds(1, before)]
     if -1 in stock_values:
         b_index = stock_values.index(-1)
         stock_values = stock_values[:b_index]
-        print("adjusted stock values", stock_values)
     average_stock = statistics.mean(stock_values)
     return average_stock
 
@@ -400,15 +461,15 @@ def calculate_late_stock(player: Type[Player]) -> int:
     after = before + C.LATE_WINDOW
     end = C.NUM_ROUNDS
     if player.round_number >= before:
-        stock_up = end - before - player.in_round(before).finalStock
+        stock_up = end - before - player.in_round(before).final_stock
     else:
         stock_up = 0
     # Adjust late stock with pre-defined window of time for subjects
     # to recognize inflation change
-    if stock_up > 0 and player.in_round(after).finalStock == -1:
-        late = stock_up - player.in_round(after).finalStock
+    if stock_up > 0 and player.in_round(after).final_stock == -1:
+        late = stock_up - player.in_round(after).final_stock
     if stock_up > 0:
-        late = stock_up - player.in_round(after).finalStock
+        late = stock_up - player.in_round(after).final_stock
     else:
         late = 0
     return late
@@ -419,10 +480,8 @@ def determine_errors(player: Type[Player]) -> Dict[str, float]:
     end = C.NUM_ROUNDS
     errors = ["early", "late", "excess"]
     early = average_early_stock(player)
-    print("first error", early)
     late = calculate_late_stock(player)
-    print("second error", late)
-    excess = player.in_round(end).finalStock
+    excess = player.in_round(end).final_stock
     return dict(zip(errors, [early, late, excess]))
 
 
@@ -450,14 +509,13 @@ class MyPage(Page):
     inflation rate, salary, stock of goods and interests recieved"""
 
     live_method = live_method
-    print("yes", type(live_method))
     form_model = "player"
-    form_fields = ["responseTime"]
+    form_fields = ["response_time"]
 
     @staticmethod
     def error_message(player, value):
         "Message saying insufficient cash"
-        if player.finalSavings < 0:
+        if player.final_savings < 0:
             return Lexicon.error_task_insufficient_cash.format(Lexicon.total_cash)
 
     @staticmethod
@@ -465,15 +523,15 @@ class MyPage(Page):
         """Moves to next round after timeout happened"""
         participant = player.participant
         participant.periods_survived = player.round_number
-        player.finalStock -= 1
+        player.final_stock -= 1
 
     @staticmethod
     def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         """Send values from this __init__ script to Django components in the HTML"""
         interest_rate = {"real": False, "nominal": True}
         task_int = {"int": False}
-        if player.round_number > 1 and player.finalStock == 0:
-            player.finalStock = player.in_round(player.round_number - 1).finalStock
+        if player.round_number > 1 and player.final_stock == 0:
+            player.final_stock = player.in_round(player.round_number - 1).final_stock
         return dict(
             income=cu(C.INCOME),
             **interest_rate,
@@ -580,8 +638,8 @@ class Failed(Page):
     def is_displayed(player: Type[Player]) -> bool:
         "Displayed if subject advances with a stock or savings balance less than 0"
         return (
-            player.in_round(player.round_number).finalStock < 0
-            or player.in_round(player.round_number).finalSavings < 0
+            player.in_round(player.round_number).final_stock < 0
+            or player.in_round(player.round_number).final_savings < 0
         )
 
     @staticmethod
@@ -638,7 +696,7 @@ class Results(Page):
 
         return dict(
             round_text=round_text,
-            final_results=player.finalSavings,
+            final_results=player.final_savings,
             Lexicon=Lexicon,
             **which_language,
         )
@@ -648,9 +706,11 @@ class Results(Page):
         """Store data to PARTICIPANT_FIELDS to access in other apps, like `session_resulst`"""
         participant = player.participant
 
-        participant.task_results = float(player.finalSavings)
+        participant.task_results = float(player.final_savings)
         setattr(
-            participant, f"task_results_{participant.round}", float(player.finalSavings)
+            participant,
+            f"task_results_{participant.round}",
+            float(player.final_savings),
         )
         print(
             "Current recorded result: ",
