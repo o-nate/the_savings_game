@@ -221,10 +221,26 @@ def qualitative_expectation_choices(
 
 def calculate_price(player: Player) -> float:
     """Calculate new price of good based on inflation and round in Savings Game"""
+    # * Calculate new price
     if player.round_number == 1:
-        pass
+        # * If first month, use original price from C.PRODUCTS_DICT["1"]["unit_price"]
+        player.new_price = float(
+            C.PRODUCTS_DICT["1"]["unit_price"]
+            * (
+                1
+                + C.INFLATION_DICT[player.round_number][
+                    str(player.participant.inflation[(player.participant.round - 1)])
+                ]
+            )
+        )
     else:
-        pass
+        # * If after first month, use price from previous month
+        player.new_price = player.in_round(player.round_number - 1).new_price * (
+            1
+            + C.INFLATION_DICT[player.round_number][
+                str(player.participant.inflation[(player.participant.round - 1)])
+            ]
+        )
 
 
 def change_quantity_in_cart(data_from_click: Dict[str, Union[str, int]]) -> None:
@@ -232,6 +248,37 @@ def change_quantity_in_cart(data_from_click: Dict[str, Union[str, int]]) -> None
     Adjust quantity in shopping cart based on the button clicked (+1 or -1) and
     whether or not the item is already in the shopping cart
     """
+    # * Add and remove from shopping cart
+    if "sku" in data:
+        # * If buttons +1 or -1 clicked to adjust quantity in shopping cart, determine ...
+        print("data", data)
+        # * ... which product
+        sku = data["sku"]
+        # * ... if added or removed from cart
+        delta = data["delta"]
+        matches = Item.filter(player=player, sku=sku)
+        print("matches", matches)
+        # * If quantity already in cart ...
+        if matches:
+            # * ... adjust quantity based on button clicked (+1 or -1)
+            [item] = matches
+            print("item.quantity", item.quantity)
+            item.quantity += delta
+            # * If last quantity in cart, remove item from cart
+            if item.quantity <= 0:
+                item.delete()
+        # * If not already in cart, create new item in cart
+        else:
+            Item.create(
+                player=player,
+                quantity=delta,
+                sku=sku,
+                name=C.PRODUCTS_DICT[sku]["name"],
+                unit_price=player.new_price,
+            )
+
+    items = Item.filter(player=player)
+    item_dicts = [to_dict(item) for item in items]
 
 
 def calculate_initial_savings(player: Player) -> float:
@@ -263,17 +310,167 @@ def calculate_final_stock(player: Player) -> float:
 def calculate_interest_earned(player: Player) -> float:
     """Calculate interest earned on savings from prior period"""
     if player.round_number == 1:
-        pass
+        # * Use initial quantity purchased for final_stock
+        player.final_stock = sum([item.quantity for item in items])
+        # * Calculate interest rate (without monetary policy)
+        player.interest_earned = 0
+        # * Calculate real (rather than nominal) interest rate
+        player.real_interest = round(
+            100
+            * (
+                C.INTEREST_RATE
+                - C.INFLATION_DICT[player.round_number][
+                    str(player.participant.inflation[(player.participant.round - 1)])
+                ]
+            ),
+            2,
+        )
     else:
-        pass
+        # * Fetch previous period's final stock and add new quantity purchased
+        player.final_stock = player.in_round(player.round_number - 1).final_stock + sum(
+            [item.quantity for item in items]
+        )
+        player.interest_earned = player.in_round(
+            player.round_number - 1
+        ).final_savings * (
+            C.INTEREST_RATE
+            + (
+                C.MONETARY_POLICY
+                * C.INFLATION_DICT[player.round_number - 1][
+                    str(player.participant.inflation[(player.participant.round - 1)])
+                ]
+            )
+        )
+        player.real_interest = round(
+            100
+            * (
+                (
+                    C.INTEREST_RATE
+                    + (
+                        C.MONETARY_POLICY
+                        * C.INFLATION_DICT[player.round_number - 1][
+                            str(
+                                player.participant.inflation[
+                                    (player.participant.round - 1)
+                                ]
+                            )
+                        ]
+                    )
+                )
+                - C.INFLATION_DICT[player.round_number][
+                    str(player.participant.inflation[(player.participant.round - 1)])
+                ]
+            ),
+            2,
+        )
+    player.cash_on_hand = player.initial_savings + C.INCOME
+    player.final_savings = player.cash_on_hand - player.total_price
+    player.new_price = player.new_price
+    player.decision = json.dumps(
+        {
+            "item": [item.sku for item in items],
+            "quantity": [item.quantity for item in items],
+            "price": [float(item.unit_price) for item in items],
+        }
+    )
+
+    return {
+        player.id_in_group: dict(
+            items=item_dicts,
+            total_price=player.total_price,
+            initial_savings=player.initial_savings,
+            interest_earned=player.interest_earned,
+            cash_on_hand=player.cash_on_hand,
+            final_savings=player.final_savings,
+            final_stock=player.final_stock,
+            decision=player.decision,
+            new_price=player.new_price,
+            real_interest=player.real_interest,
+        )
+    }
 
 
 def calculate_real_interest(player: Player) -> float:
     """Calculate real interest rate (rather than nominal)"""
     if player.round_number == 1:
-        pass
+        # * Use initial quantity purchased for final_stock
+        player.final_stock = sum([item.quantity for item in items])
+        # * Calculate interest rate (without monetary policy)
+        player.interest_earned = 0
+        # * Calculate real (rather than nominal) interest rate
+        player.real_interest = round(
+            100
+            * (
+                C.INTEREST_RATE
+                - C.INFLATION_DICT[player.round_number][
+                    str(player.participant.inflation[(player.participant.round - 1)])
+                ]
+            ),
+            2,
+        )
     else:
-        pass
+        # * Fetch previous period's final stock and add new quantity purchased
+        player.final_stock = player.in_round(player.round_number - 1).final_stock + sum(
+            [item.quantity for item in items]
+        )
+        player.interest_earned = player.in_round(
+            player.round_number - 1
+        ).final_savings * (
+            C.INTEREST_RATE
+            + (
+                C.MONETARY_POLICY
+                * C.INFLATION_DICT[player.round_number - 1][
+                    str(player.participant.inflation[(player.participant.round - 1)])
+                ]
+            )
+        )
+        player.real_interest = round(
+            100
+            * (
+                (
+                    C.INTEREST_RATE
+                    + (
+                        C.MONETARY_POLICY
+                        * C.INFLATION_DICT[player.round_number - 1][
+                            str(
+                                player.participant.inflation[
+                                    (player.participant.round - 1)
+                                ]
+                            )
+                        ]
+                    )
+                )
+                - C.INFLATION_DICT[player.round_number][
+                    str(player.participant.inflation[(player.participant.round - 1)])
+                ]
+            ),
+            2,
+        )
+    player.cash_on_hand = player.initial_savings + C.INCOME
+    player.final_savings = player.cash_on_hand - player.total_price
+    player.new_price = player.new_price
+    player.decision = json.dumps(
+        {
+            "item": [item.sku for item in items],
+            "quantity": [item.quantity for item in items],
+            "price": [float(item.unit_price) for item in items],
+        }
+    )
+
+    return {
+        player.id_in_group: dict(
+            items=item_dicts,
+            total_price=player.total_price,
+            initial_savings=player.initial_savings,
+            interest_earned=player.interest_earned,
+            cash_on_hand=player.cash_on_hand,
+            final_savings=player.final_savings,
+            final_stock=player.final_stock,
+            decision=player.decision,
+            new_price=player.new_price,
+            real_interest=player.real_interest,
+        )
+    }
 
 
 def total_price(item: Type[Item]) -> float:

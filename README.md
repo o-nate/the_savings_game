@@ -27,7 +27,7 @@ If succesfully activated, you should see `(the_savings_game)` appear to the left
 ## Running the Savings Game
 To run the Savings Game locally, open your terminal, either in your preferred code-editor (IDE) or directly from your desktop, and navigate to the repository's directory (i.e. folder) in the terminal. If you created a virtual environment, first activate it using the following command.
 ```
-conda activate the_savings_game
+
 ```
 
 Next, execute:
