@@ -1,4 +1,5 @@
 from ast import Num
+from typing import List, Dict, Union, Type
 from otree.api import *
 from settings import SESSION_CONFIG_DEFAULTS, SESSION_CONFIGS, LANGUAGE_CODE
 
@@ -43,6 +44,7 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
+    "Register players answers to questions"
     ## choices = [[value,label],[value,label]]
     q1 = models.IntegerField(
         label=Lexicon.session_results_q1,
@@ -68,7 +70,7 @@ class Player(BasePlayer):
     )
 
 
-def get_behavioral_remuneration(player: Player):
+def get_behavioral_remuneration(player: Type[Player]) -> float:
     """Calculate remuneration"""
     # Calculate additional remunerations
     behavioral_remuneration = sum(
@@ -78,7 +80,7 @@ def get_behavioral_remuneration(player: Player):
     return behavioral_remuneration
 
 
-def get_behavioral_task_names(player: Player) -> dict:
+def get_behavioral_task_names(player: Type[Player]) -> dict:
     """Create dictionary with language-appropriate task names"""
     task_list = [v for v in player.participant.remunerated_behavioral.keys()]
     task_names = {task: getattr(Lexicon, f"{task}") for task in task_list}
@@ -93,6 +95,7 @@ def convert_to_euros(amount: float, rounding: int = 2) -> float:
 
 # PAGES
 class Final_Results(Page):
+    "shows final result of experiment"
 
     # @staticmethod
     # def js_vars(player: Player):
@@ -108,7 +111,7 @@ class Final_Results(Page):
     #     )
 
     @staticmethod
-    def vars_for_template(player: Player):
+    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         """Experiment's final results"""
         participant = player.participant
 
@@ -116,6 +119,7 @@ class Final_Results(Page):
         task_1 = cu(participant.task_results_1)
         # task_2 = cu(participant.task_results_2)
         task_1_euros = convert_to_euros(task_1)
+        print("tee type is", type(task_1_euros))
         # task_2_euros = convert_to_euros(task_2)
         remuneration_task = 0
         for i in range(1, SESSION_CONFIG_DEFAULTS["exp_length_rounds"] + 1):
@@ -159,18 +163,20 @@ class Final_Results(Page):
 
 
 class Feedback(Page):
+    "Give feedback after pl yer answered all the questions"
     form_model = "player"
     form_fields = ["q1", "q2", "q3", "q5", "q6", "q4"]
 
     @staticmethod
-    def vars_for_template(player: Player):
+    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         return dict(Lexicon=Lexicon, **which_language)
 
 
 class End(Page):
+    "Shows final saving balance after experiment is complete"
 
     @staticmethod
-    def vars_for_template(player: Player):
+    def vars_for_template(player: Type[Player]) -> Dict[str, Union[str, bool]]:
         return dict(Lexicon=Lexicon, **which_language)
 
 
