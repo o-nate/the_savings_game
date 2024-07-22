@@ -64,3 +64,40 @@ The Savings Game code is separated into an `__init__.py`, which acts at the "bac
 ## Settings
 Setting can be defined in two places, either in the experiment-wide `SESSION_CONFIG_DEFAULTS` dictionary in `settings.py` or in the `C` class of the `__init__.py` file for a specific app. Settings defined in `SESSION_CONFIG_DEFAULTS` apply across all apps in the experiment. Settings defined in the `C` class of an app are app-specific.
 
+## Multi-language
+The program offers multi-language support, currently in English and French. To define the language of the experiment, simply change the value of `LANGUAGE_CODE` in `settings.py`, using the ISO-639 code (`en` for English, `fr` for French).
+
+### Adjusting text
+The multi-language functionality means that text can be defined in one of two ways throughout the program. Terms and phrases that are repeated throughout the experiment are defined in the `_static/lexicon_en.py` and `_static/lexicon_fr.py` files.
+
+Each file contains a class `Lexicon` with the same attributes (i.e. variables), one for each term or phase. These attributes are then referenced where necessary in the `__init__.py` and HTML files.
+
+The text for questions, defined in `Player`, are set via the `Lexicon` class. To change the text of the question, we have to change the text in the corresponding attributes in the two `_static/lexicon_en.py` and `_static/lexicon_fr.py` files.
+
+For examle, if we want to change the text of the first question in the `instructions.py`, we update the text for `Lexicon.q1` in `_static/lexicon_en.py` and `_static/lexicon_fr.py` (assuming we will use both languages). If we want to change the text displayed on the button to finalize a purchase, we update the text for `Lexicon.finalize_purchase` in both files, and the text will be update across the complete experiment. 
+
+In the HTML files, terms and phrase from `Lexicon` are inserted via the Django dependency. To add a term or phrase from `Lexicon` into text in the HTML, use the `{{}}` with the attribute.
+
+For example:
+```
+<p>
+    Here is an example using the term for {{ Lexicon.food }}
+</p>
+```
+
+### Adding a new language
+To add a new language, copy one of the lexicon files, adding the language to the file name. Then, replace the terms in the attributes. 
+After, in each `__init__.py` file, add the language to the following:
+```
+if LANGUAGE_CODE == "fr":
+    from _static.lexicon_fr import Lexicon
+elif LANGUAGE_C0DE == "new_language_code"
+    from _static.lexicon_new_language_code import Lexicon
+else:
+    from _static.lexicon_en import Lexicon
+
+# This is the dict you should pass to each page in vars_for_template,
+# enabling you to do if-statements like {{ if fr }} Oui {{ else }} Yes {{ endif }}
+which_language = {"en": False, "fr": False, "new_language_code": False}  # noqa
+which_language[LANGUAGE_CODE[:2]] = True
+```
