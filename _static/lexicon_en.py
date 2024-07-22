@@ -2,6 +2,7 @@ from settings import SESSION_CONFIG_DEFAULTS
 
 
 class Lexicon:
+    """Define English terms here"""
 
     # task
     starting_balances = "Starting Balances"
