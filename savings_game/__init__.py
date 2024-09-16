@@ -1,7 +1,7 @@
 """Defines data collected and functions for the Savings Game"""
 
 import csv
-from typing import List, Dict, Union, Type
+from typing import Any, Generator, List, Dict, Union, Type
 from decimal import *
 import json
 import random
@@ -159,7 +159,7 @@ class Item(ExtraModel):
     new_price = models.FloatField()
 
 
-def custom_export(players) -> None:
+def custom_export(players: Type[Player]) -> Generator[Any, Any, Any]:
     """Export Item table"""
 
     yield [
