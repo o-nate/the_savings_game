@@ -161,7 +161,7 @@ class Lexicon:
     description_my_cart = "My Cart shows you the Quantity of Food you have selected and the Total Price you will pay."
     q1 = "The final value of which of these balances determines your performance-based remuneration for the game?"
 
-    q2 = f"""What is the minimum amout you must have in your {stock} 
+    q2 = f"""What is the minimum amount you must have in your {stock} 
     before clicking the "{finalize_purchase}" button to survive to the next 
     month?"""
 
